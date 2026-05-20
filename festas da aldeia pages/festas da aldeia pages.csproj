@@ -14,7 +14,18 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.6" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.6">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\festas da aldeia\Data\ApplicationDbContext.cs" Link="Shared\Data\ApplicationDbContext.cs" />
+    <Compile Include="..\festas da aldeia\Models\Artista.cs" Link="Shared\Models\Artista.cs" />
+    <Compile Include="..\festas da aldeia\Models\Cartaz.cs" Link="Shared\Models\Cartaz.cs" />
+    <Compile Include="..\festas da aldeia\Models\Evento.cs" Link="Shared\Models\Evento.cs" />
+    <Compile Include="..\festas da aldeia\Models\Local.cs" Link="Shared\Models\Local.cs" />
   </ItemGroup>
 
 </Project>

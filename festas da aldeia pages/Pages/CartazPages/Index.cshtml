@@ -1,0 +1,66 @@
+@page
+@model festas_da_aldeia_pages.Pages.CartazPages.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].DataHoraAtuacao)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].DuracaoMinutos)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].IdEvento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].Evento)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].IdArtista)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cartaz[0].Artista)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Cartaz) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.DataHoraAtuacao)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.DuracaoMinutos)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.IdEvento)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Evento)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.IdArtista)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Artista)
+            </td>
+            <td>
+                <a asp-page="./Edit" asp-route-id="@item.IdCartaz">Edit</a> |
+                <a asp-page="./Details" asp-route-id="@item.IdCartaz">Details</a> |
+                <a asp-page="./Delete" asp-route-id="@item.IdCartaz">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

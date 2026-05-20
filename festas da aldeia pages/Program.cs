@@ -1,4 +1,4 @@
-using festas_da_aldeia_pages.Data;
+using festas_da_aldeia.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

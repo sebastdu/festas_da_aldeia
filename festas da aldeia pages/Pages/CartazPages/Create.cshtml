@@ -1,0 +1,62 @@
+@page
+@model festas_da_aldeia_pages.Pages.CartazPages.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Cartaz</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Cartaz.DataHoraAtuacao" class="control-label"></label>
+                <input asp-for="Cartaz.DataHoraAtuacao" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Cartaz.DataHoraAtuacao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cartaz.DuracaoMinutos" class="control-label"></label>
+                <input asp-for="Cartaz.DuracaoMinutos" class="form-control" />
+                <span asp-validation-for="Cartaz.DuracaoMinutos" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Cartaz.IdEvento" class="control-label"></label>
+                <input asp-for="Cartaz.IdEvento" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Cartaz.IdEvento" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cartaz.Evento" class="control-label"></label>
+                <input asp-for="Cartaz.Evento" class="form-control" />
+                <span asp-validation-for="Cartaz.Evento" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Cartaz.IdArtista" class="control-label"></label>
+                <input asp-for="Cartaz.IdArtista" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Cartaz.IdArtista" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cartaz.Artista" class="control-label"></label>
+                <input asp-for="Cartaz.Artista" class="form-control" />
+                <span asp-validation-for="Cartaz.Artista" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

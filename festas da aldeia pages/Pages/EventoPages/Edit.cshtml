@@ -1,0 +1,74 @@
+@page
+@model festas_da_aldeia_pages.Pages.EventoPages.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Evento</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Evento.IdEvento" />
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Evento.Nome" class="control-label"></label>
+                <input asp-for="Evento.Nome" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Evento.Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Evento.Descricao" class="control-label"></label>
+                <input asp-for="Evento.Descricao" class="form-control" />
+                <span asp-validation-for="Evento.Descricao" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Evento.DataInicio" class="control-label"></label>
+                <input asp-for="Evento.DataInicio" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Evento.DataInicio" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Evento.DataFim" class="control-label"></label>
+                <input asp-for="Evento.DataFim" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Evento.DataFim" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Evento.Patrocinador" class="control-label"></label>
+                <input asp-for="Evento.Patrocinador" class="form-control" />
+                <span asp-validation-for="Evento.Patrocinador" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Evento.IdLocal" class="control-label"></label>
+                <input asp-for="Evento.IdLocal" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Evento.IdLocal" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Evento.Local" class="control-label"></label>
+                <input asp-for="Evento.Local" class="form-control" />
+                <span asp-validation-for="Evento.Local" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Evento.Cartazes" class="control-label"></label>
+                <input asp-for="Evento.Cartazes" class="form-control" />
+                <span asp-validation-for="Evento.Cartazes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

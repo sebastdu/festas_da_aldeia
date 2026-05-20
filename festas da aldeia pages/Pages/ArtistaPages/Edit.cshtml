@@ -1,0 +1,56 @@
+@page
+@model festas_da_aldeia_pages.Pages.ArtistaPages.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Artista</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Artista.IdArtista" />
+            <div class="form-group">
+                <span class="text-danger">*</span>
+                <label asp-for="Artista.Nome" class="control-label"></label>
+                <input asp-for="Artista.Nome" class="form-control" aria-required="true"/>
+                <span asp-validation-for="Artista.Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artista.Biografia" class="control-label"></label>
+                <input asp-for="Artista.Biografia" class="form-control" />
+                <span asp-validation-for="Artista.Biografia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artista.Contacto" class="control-label"></label>
+                <input asp-for="Artista.Contacto" class="form-control" />
+                <span asp-validation-for="Artista.Contacto" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artista.LinkFotoPerfil" class="control-label"></label>
+                <input asp-for="Artista.LinkFotoPerfil" class="form-control" />
+                <span asp-validation-for="Artista.LinkFotoPerfil" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Artista.Cartazes" class="control-label"></label>
+                <input asp-for="Artista.Cartazes" class="form-control" />
+                <span asp-validation-for="Artista.Cartazes" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
