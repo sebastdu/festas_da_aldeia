@@ -45,10 +45,18 @@ public class DeleteModel : PageModel
             return NotFound();
         }
 
-        var evento = await _context.Eventos.FindAsync(id);
+        var evento = await _context.Eventos.Include(e => e.Cartazes).FirstOrDefaultAsync(e => e.IdEvento == id);
         if (evento != null)
         {
             Evento = evento;
+
+            // Validação customizada: impedir a eliminação se existirem artistas escalados no cartaz
+            if (Evento.Cartazes != null && Evento.Cartazes.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Não é possível eliminar o evento porque existem artistas associados a ele no cartaz.");
+                return Page();
+            }
+
             _context.Eventos.Remove(Evento);
             await _context.SaveChangesAsync();
         }

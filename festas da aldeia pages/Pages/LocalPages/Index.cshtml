@@ -23,9 +23,6 @@
                 @Html.DisplayNameFor(model => model.Local[0].Outside)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Local[0].Coordenadas)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Local[0].Eventos)
             </th>
             <th></th>
@@ -44,10 +41,14 @@
                 @Html.DisplayFor(model => item.Outside)
             </td>
             <td>
-                @Html.DisplayFor(model => item.Coordenadas)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Eventos)
+                @if (item.Eventos != null && item.Eventos.Any())
+                {
+                    @string.Join(", ", item.Eventos.Select(e => e.Nome))
+                }
+                else
+                {
+                    <span class="text-muted">Sem eventos</span>
+                }
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.IdLocal">Edit</a> |

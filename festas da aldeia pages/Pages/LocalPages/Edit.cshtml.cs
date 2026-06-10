@@ -38,9 +38,28 @@ public class EditModel : PageModel
     // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.Remove("Local.Eventos");
+
+        // Validação customizada: Nome único (excluindo o próprio local)
+        if (!string.IsNullOrWhiteSpace(Local.Nome) &&
+            await _context.Locais.AnyAsync(l => l.Nome.ToLower() == Local.Nome.Trim().ToLower() && l.IdLocal != Local.IdLocal))
+        {
+            ModelState.AddModelError("Local.Nome", "Já existe um local registado com este nome.");
+        }
+
         if (!ModelState.IsValid)
         {
             return Page();
+        }
+
+        Local.Nome = Local.Nome.Trim();
+        if (Local.Descricao != null)
+        {
+            Local.Descricao = Local.Descricao.Trim();
+        }
+        if (Local.Coordenadas != null)
+        {
+            Local.Coordenadas = Local.Coordenadas.Trim();
         }
 
         _context.Attach(Local).State = EntityState.Modified;

@@ -27,7 +27,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Descrição")]
         [StringLength(500, ErrorMessage = "A {0} deve ter um máximo de {1} caracteres.")]
-        public string Descricao { get; set; } = string.Empty;
+        public string? Descricao { get; set; } = string.Empty;
 
         /// <summary>
         /// Data e hora de início do evento
@@ -48,7 +48,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Patrocinador")]
         [StringLength(100, ErrorMessage = "O {0} deve ter um máximo de {1} caracteres.")]
-        public string Patrocinador { get; set; } = string.Empty;
+        public string? Patrocinador { get; set; } = string.Empty;
 
         /*  ************************************** 
         *  Relationships

@@ -19,6 +19,6 @@ public class IndexModel : PageModel
 
     public async Task OnGetAsync()
     {
-        Evento = await _context.Eventos.ToListAsync();
+        Evento = await _context.Eventos.Include(e => e.Local).ToListAsync();
     }
 }

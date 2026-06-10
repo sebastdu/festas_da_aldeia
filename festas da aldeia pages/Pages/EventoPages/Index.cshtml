@@ -29,13 +29,7 @@
                 @Html.DisplayNameFor(model => model.Evento[0].Patrocinador)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Evento[0].IdLocal)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.Evento[0].Local)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Evento[0].Cartazes)
             </th>
             <th></th>
         </tr>
@@ -59,13 +53,7 @@
                 @Html.DisplayFor(model => item.Patrocinador)
             </td>
             <td>
-                @Html.DisplayFor(model => item.IdLocal)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Local)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Cartazes)
+                @Html.DisplayFor(modelItem => item.Local.Nome)
             </td>
             <td>
                 <a asp-page="./Edit" asp-route-id="@item.IdEvento">Edit</a> |

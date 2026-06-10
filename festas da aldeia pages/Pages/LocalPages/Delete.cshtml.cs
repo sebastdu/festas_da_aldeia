@@ -45,10 +45,18 @@ public class DeleteModel : PageModel
             return NotFound();
         }
 
-        var local = await _context.Locais.FindAsync(id);
+        var local = await _context.Locais.Include(l => l.Eventos).FirstOrDefaultAsync(l => l.IdLocal == id);
         if (local != null)
         {
             Local = local;
+
+            // Validação customizada: verificar se existem eventos associados
+            if (Local.Eventos != null && Local.Eventos.Any())
+            {
+                ModelState.AddModelError(string.Empty, "Não é possível eliminar o local porque existem eventos associados a ele.");
+                return Page();
+            }
+
             _context.Locais.Remove(Local);
             await _context.SaveChangesAsync();
         }

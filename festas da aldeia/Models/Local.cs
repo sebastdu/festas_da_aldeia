@@ -26,7 +26,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Descrição")]
         [StringLength(500, ErrorMessage = "A {0} deve ter um máximo de {1} caracteres.")]
-        public string Descricao { get; set; } = string.Empty;
+        public string? Descricao { get; set; } = string.Empty;
 
         /// <summary>
         /// Indica se o local é exterior ou interior
@@ -41,7 +41,7 @@ namespace festas_da_aldeia.Models
         [StringLength(500, ErrorMessage = "As {0} devem ter um máximo de {1} caracteres.")]
         [RegularExpression(@"^(-?\d+(\.\d+)?),(-?\d+(\.\d+)?)$|^https?:\/\/.+", 
             ErrorMessage = "As coordenadas devem estar no formato latitude,longitude ou ser uma URL válida.")]
-        public string Coordenadas { get; set; } = string.Empty;
+        public string? Coordenadas { get; set; } = string.Empty;
 
         /*  ************************************** 
         *  Relationships

@@ -42,23 +42,15 @@
                 <input asp-for="Evento.Patrocinador" class="form-control" />
                 <span asp-validation-for="Evento.Patrocinador" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div class="form-group mt-2">
                 <span class="text-danger">*</span>
                 <label asp-for="Evento.IdLocal" class="control-label"></label>
-                <input asp-for="Evento.IdLocal" class="form-control" aria-required="true"/>
+                <select asp-for="Evento.IdLocal" class="form-control" asp-items="ViewBag.IdLocal" aria-required="true">
+                    <option value="">-- Selecione um Local --</option>
+                </select>
                 <span asp-validation-for="Evento.IdLocal" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="Evento.Local" class="control-label"></label>
-                <input asp-for="Evento.Local" class="form-control" />
-                <span asp-validation-for="Evento.Local" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Evento.Cartazes" class="control-label"></label>
-                <input asp-for="Evento.Cartazes" class="form-control" />
-                <span asp-validation-for="Evento.Cartazes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
