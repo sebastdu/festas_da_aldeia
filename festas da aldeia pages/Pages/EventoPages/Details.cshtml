@@ -2,54 +2,167 @@
 @model festas_da_aldeia_pages.Pages.EventoPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Evento";
 }
 
-<h1>Details</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        
+        <div class="mb-4">
+            <a asp-page="./Index" class="back-link">
+                <i class="bi bi-arrow-left"></i> Voltar à Agenda
+            </a>
+        </div>
 
-<div>
-    <h4>Evento</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.DataInicio)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.DataInicio)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.DataFim)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.DataFim)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.Patrocinador)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.Patrocinador)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Evento.Local.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Evento.Local.Nome)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Evento.IdEvento">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+        <div class="page-header-container d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h1 class="page-title-gradient mb-1">@Model.Evento.Nome</h1>
+                <p class="text-muted mb-0">Informações detalhadas sobre a atuação agendada.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-page="./Edit" asp-route-id="@Model.Evento.IdEvento" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Editar Evento
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna de Informações Principais -->
+            <div class="col-md-7">
+                <div class="info-sheet h-100 d-flex flex-column justify-content-between">
+                    <div>
+                        <div class="info-item pt-0">
+                            <div class="info-label">Nome do Evento</div>
+                            <div class="info-value fw-bold text-primary">@Model.Evento.Nome</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Local de Realização</div>
+                            <div class="info-value">
+                                @if (Model.Evento.Local != null)
+                                {
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-geo-alt-fill text-danger"></i>
+                                        <div>
+                                            <a asp-page="/LocalPages/Details" asp-route-id="@Model.Evento.IdLocal" class="fw-bold text-dark text-decoration-none">
+                                                @Model.Evento.Local.Nome
+                                            </a>
+                                            <span class="badge-custom ms-2 @(Model.Evento.Local.Outside ? "badge-outdoor" : "badge-indoor")">
+                                                @(Model.Evento.Local.Outside ? "Exterior" : "Interior")
+                                            </span>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Nenhum local associado.</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Descrição</div>
+                            <div class="info-value">
+                                @if (!string.IsNullOrEmpty(Model.Evento.Descricao))
+                                {
+                                    <p class="mb-0 text-secondary" style="white-space: pre-line;">@Model.Evento.Descricao</p>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Sem descrição disponível para este evento.</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <div class="info-label">Horário e Cronograma</div>
+                            <div class="info-value">
+                                <div class="row g-3">
+                                    <div class="col-sm-6">
+                                        <div class="p-2 border rounded bg-light">
+                                            <span class="text-muted small d-block mb-1"><i class="bi bi-calendar-check text-success me-1"></i>Início</span>
+                                            <span class="fw-semibold">@Model.Evento.DataInicio.ToString("g")</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="p-2 border rounded bg-light">
+                                            <span class="text-muted small d-block mb-1"><i class="bi bi-calendar-x text-danger me-1"></i>Fim</span>
+                                            <span class="fw-semibold">@Model.Evento.DataFim.ToString("g")</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.Evento.Patrocinador))
+                        {
+                            <div class="info-item pb-0">
+                                <div class="info-label">Apoio / Patrocínio</div>
+                                <div class="info-value d-flex align-items-center gap-2">
+                                    <i class="bi bi-award-fill text-warning" style="font-size: 1.2rem;"></i>
+                                    <span class="fw-semibold">@Model.Evento.Patrocinador</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna de Artistas (Cartaz) -->
+            <div class="col-md-5">
+                <div class="card card-custom h-100">
+                    <div class="card-body-custom d-flex flex-column h-100 justify-content-between">
+                        <div>
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="bi bi-music-note-beamed text-primary" style="font-size: 1.25rem;"></i>
+                                    <h5 class="fw-bold mb-0">Artistas no Cartaz</h5>
+                                </div>
+                                <span class="badge bg-primary rounded-pill">@(Model.Evento.Cartazes?.Count ?? 0)</span>
+                            </div>
+
+                            @if (Model.Evento.Cartazes != null && Model.Evento.Cartazes.Any())
+                            {
+                                <div class="d-flex flex-column gap-3">
+                                    @foreach (var cartaz in Model.Evento.Cartazes.OrderBy(c => c.DataHoraAtuacao))
+                                    {
+                                        <div class="p-3 border rounded-3 bg-light d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 40px; height: 40px; font-size: 1.1rem; box-shadow: var(--shadow-sm);">
+                                                    @(cartaz.Artista.Nome.Substring(0, 1).ToUpper())
+                                                </div>
+                                                <div>
+                                                    <span class="fw-bold text-dark d-block">@cartaz.Artista.Nome</span>
+                                                    <span class="text-muted small d-block">
+                                                        <i class="bi bi-clock me-1"></i>@cartaz.DataHoraAtuacao.ToString("t")
+                                                        <span class="mx-1">&bull;</span>
+                                                        <i class="bi bi-hourglass-split me-1"></i>@cartaz.DuracaoMinutos min
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <a asp-page="/ArtistaPages/Details" asp-route-id="@cartaz.IdArtista" class="btn btn-action-sm details" title="Ver Artista">
+                                                <i class="bi bi-arrow-right"></i>
+                                            </a>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="text-center py-5 border rounded-3 border-dashed bg-light">
+                                    <i class="bi bi-people text-muted mb-2" style="font-size: 2.5rem; display: block;"></i>
+                                    <span class="text-muted small">Nenhum artista adicionado ao cartaz deste evento.</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="pt-3 border-top mt-4 text-center">
+                            <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Última atualização do sistema: @DateTime.Now.Year</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>

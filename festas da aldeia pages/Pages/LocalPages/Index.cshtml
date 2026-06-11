@@ -2,60 +2,112 @@
 @model festas_da_aldeia_pages.Pages.LocalPages.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Gestão de Locais";
 }
 
-<h1>Index</h1>
+<div class="page-header-container d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+    <div>
+        <h1 class="page-title-gradient mb-1">Locais</h1>
+        <p class="text-muted mb-0">Gerencie os recintos e espaços onde decorrem as festividades da aldeia.</p>
+    </div>
+    <div>
+        <a asp-page="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-plus-lg"></i> Adicionar Novo Local
+        </a>
+    </div>
+</div>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Local[0].Nome)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Local[0].Descricao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Local[0].Outside)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Local[0].Eventos)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Local) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.Nome)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Descricao)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Outside)
-            </td>
-            <td>
-                @if (item.Eventos != null && item.Eventos.Any())
-                {
-                    @string.Join(", ", item.Eventos.Select(e => e.Nome))
-                }
-                else
-                {
-                    <span class="text-muted">Sem eventos</span>
-                }
-            </td>
-            <td>
-                <a asp-page="./Edit" asp-route-id="@item.IdLocal">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.IdLocal">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.IdLocal">Delete</a>
-            </td>
-        </tr>
+@if (!Model.Local.Any())
+{
+    <div class="card-custom text-center py-5">
+        <div class="card-body-custom">
+            <div class="card-icon-container mx-auto mb-3">
+                <i class="bi bi-geo-alt"></i>
+            </div>
+            <h4 class="fw-bold">Nenhum local registado</h4>
+            <p class="text-muted">Comece por registar um novo local para as festas.</p>
+            <a asp-page="Create" class="btn btn-outline-primary mt-2">
+                <i class="bi bi-plus-lg"></i> Registar Primeiro Local
+            </a>
+        </div>
+    </div>
 }
-    </tbody>
-</table>
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var item in Model.Local)
+        {
+            <div class="col">
+                <div class="card h-100 card-custom">
+                    <div class="card-body-custom d-flex flex-column h-100 justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="card-icon-container mb-0">
+                                    @if (item.Outside)
+                                    {
+                                        <i class="bi bi-tree-fill text-success" title="Espaço Exterior"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-house-door-fill text-primary" title="Espaço Interior"></i>
+                                    }
+                                </div>
+                                <span class="badge-custom @(item.Outside ? "badge-outdoor" : "badge-indoor")">
+                                    <i class="bi @(item.Outside ? "bi-sun-fill" : "bi-door-closed-fill")"></i>
+                                    @(item.Outside ? "Exterior" : "Interior")
+                                </span>
+                            </div>
+
+                            <h4 class="card-title fw-bold mb-2">@item.Nome</h4>
+                            
+                            @if (!string.IsNullOrEmpty(item.Descricao))
+                            {
+                                <p class="text-muted card-text small mb-3">@item.Descricao</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted card-text small fst-italic mb-3">Sem descrição disponível.</p>
+                            }
+                        </div>
+
+                        <div>
+                            <div class="mb-4">
+                                <h6 class="text-uppercase text-muted fw-bold small mb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                    <i class="bi bi-calendar-event me-1"></i> Eventos Associados
+                                </h6>
+                                @if (item.Eventos != null && item.Eventos.Any())
+                                {
+                                    <div class="d-flex flex-wrap gap-1">
+                                        @foreach (var ev in item.Eventos)
+                                        {
+                                            <span class="badge bg-light text-dark border rounded-pill py-1 px-2 small">@ev.Nome</span>
+                                        }
+                                    </div>
+                                }
+                                else
+                                {
+                                    <span class="text-muted small fst-italic">Sem eventos agendados</span>
+                                }
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <span class="small text-muted">ID: #@item.IdLocal</span>
+                                <div class="d-flex gap-2">
+                                    <a asp-page="./Edit" asp-route-id="@item.IdLocal" class="btn btn-action-sm" title="Editar Local">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-page="./Details" asp-route-id="@item.IdLocal" class="btn btn-action-sm details" title="Ver Detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@item.IdLocal" class="btn btn-action-sm delete" title="Eliminar Local">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

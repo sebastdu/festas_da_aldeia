@@ -23,7 +23,11 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
-        var evento = await _context.Eventos.Include(e => e.Local).FirstOrDefaultAsync(m => m.IdEvento == id);
+        var evento = await _context.Eventos
+            .Include(e => e.Local)
+            .Include(e => e.Cartazes)
+                .ThenInclude(c => c.Artista)
+            .FirstOrDefaultAsync(m => m.IdEvento == id);
         if (evento is null)
         {
             return NotFound();
