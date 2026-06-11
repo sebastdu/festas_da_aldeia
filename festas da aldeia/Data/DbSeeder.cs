@@ -12,12 +12,23 @@ namespace festas_da_aldeia.Data
             string adminRole = "Admin";
             if (!await roleManager.RoleExistsAsync(adminRole))
             {
-                await roleManager.CreateAsync(new IdentityRole(adminRole));
+                var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Falha ao criar a Role Admin: {errors}");
+                }
             }
 
             // 2. Seed Admin User
             string adminEmail = "admin@festas.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
+            if (adminUser != null)
+            {
+                // Garantir que a password atualizada (com maiúscula) é aplicada recriando o utilizador
+                await userManager.DeleteAsync(adminUser);
+                adminUser = null;
+            }
             if (adminUser == null)
             {
                 adminUser = new IdentityUser
@@ -26,15 +37,21 @@ namespace festas_da_aldeia.Data
                     Email = adminEmail,
                     EmailConfirmed = true
                 };
-                var createResult = await userManager.CreateAsync(adminUser, "123qwe##");
+                var createResult = await userManager.CreateAsync(adminUser, "123Qwe##");
                 if (createResult.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, adminRole);
                 }
+                else
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Falha ao criar o utilizador administrador: {errors}");
+                }
             }
 
             // 3. Seed Locais (Locations)
-            if (!await context.Locais.AnyAsync())
+            // Usamos verificação específica de nome para permitir que corra mesmo se o utilizador já inseriu dados manuais
+            if (!await context.Locais.AnyAsync(l => l.Nome == "Recinto Principal (Praça do Município)"))
             {
                 var locais = new List<Local>
                 {
@@ -65,7 +82,7 @@ namespace festas_da_aldeia.Data
             }
 
             // 4. Seed Artistas (Artists)
-            if (!await context.Artistas.AnyAsync())
+            if (!await context.Artistas.AnyAsync(a => a.Nome == "Quim Barreiros"))
             {
                 var artistas = new List<Artista>
                 {
@@ -96,7 +113,7 @@ namespace festas_da_aldeia.Data
             }
 
             // 5. Seed Eventos (Events)
-            if (!await context.Eventos.AnyAsync())
+            if (!await context.Eventos.AnyAsync(e => e.Nome == "Grande Concerto de Abertura"))
             {
                 // Vamos buscar os locais inseridos para ter IDs válidos
                 var recintoPrincipal = await context.Locais.FirstOrDefaultAsync(l => l.Nome.Contains("Recinto Principal"));
@@ -140,45 +157,49 @@ namespace festas_da_aldeia.Data
             }
 
             // 6. Seed Cartazes (Lineup)
-            if (!await context.Cartazes.AnyAsync())
+            // Verificamos se existem cartazes para os eventos seeded para evitar duplicações
+            var concertoAbertura = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Concerto de Abertura"));
+            var arraialPopular = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Arraial Popular"));
+            var tardeTradicao = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Tarde de Cantares"));
+
+            if (concertoAbertura != null && arraialPopular != null && tardeTradicao != null)
             {
-                var concertoAbertura = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Concerto de Abertura"));
-                var arraialPopular = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Arraial Popular"));
-                var tardeTradicao = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Tarde de Cantares"));
-
-                var quimBarreiros = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Quim Barreiros"));
-                var anaMalhoa = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Ana Malhoa"));
-                var rancho = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Rancho"));
-
-                if (concertoAbertura != null && arraialPopular != null && tardeTradicao != null &&
-                    quimBarreiros != null && anaMalhoa != null && rancho != null)
+                bool hasLineup = await context.Cartazes.AnyAsync(c => c.IdEvento == concertoAbertura.IdEvento || c.IdEvento == arraialPopular.IdEvento);
+                if (!hasLineup)
                 {
-                    var cartazes = new List<Cartaz>
+                    var quimBarreiros = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Quim Barreiros"));
+                    var anaMalhoa = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Ana Malhoa"));
+                    var rancho = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Rancho"));
+
+                    if (quimBarreiros != null && anaMalhoa != null && rancho != null)
                     {
-                        new Cartaz
+                        var cartazes = new List<Cartaz>
                         {
-                            IdEvento = concertoAbertura.IdEvento,
-                            IdArtista = anaMalhoa.IdArtista,
-                            DataHoraAtuacao = concertoAbertura.DataInicio.AddMinutes(15), // Começa 15 min após início do evento
-                            DuracaoMinutos = 90
-                        },
-                        new Cartaz
-                        {
-                            IdEvento = arraialPopular.IdEvento,
-                            IdArtista = quimBarreiros.IdArtista,
-                            DataHoraAtuacao = arraialPopular.DataInicio.AddHours(1), // Começa 1h após início do arraial
-                            DuracaoMinutos = 120
-                        },
-                        new Cartaz
-                        {
-                            IdEvento = tardeTradicao.IdEvento,
-                            IdArtista = rancho.IdArtista,
-                            DataHoraAtuacao = tardeTradicao.DataInicio.AddMinutes(30),
-                            DuracaoMinutos = 90
-                        }
-                    };
-                    await context.Cartazes.AddRangeAsync(cartazes);
-                    await context.SaveChangesAsync();
+                            new Cartaz
+                            {
+                                IdEvento = concertoAbertura.IdEvento,
+                                IdArtista = anaMalhoa.IdArtista,
+                                DataHoraAtuacao = concertoAbertura.DataInicio.AddMinutes(15), // Começa 15 min após início do evento
+                                DuracaoMinutos = 90
+                            },
+                            new Cartaz
+                            {
+                                IdEvento = arraialPopular.IdEvento,
+                                IdArtista = quimBarreiros.IdArtista,
+                                DataHoraAtuacao = arraialPopular.DataInicio.AddHours(1), // Começa 1h após início do arraial
+                                DuracaoMinutos = 120
+                            },
+                            new Cartaz
+                            {
+                                IdEvento = tardeTradicao.IdEvento,
+                                IdArtista = rancho.IdArtista,
+                                DataHoraAtuacao = tardeTradicao.DataInicio.AddMinutes(30),
+                                DuracaoMinutos = 90
+                            }
+                        };
+                        await context.Cartazes.AddRangeAsync(cartazes);
+                        await context.SaveChangesAsync();
+                    }
                 }
             }
         }
