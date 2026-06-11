@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <Compile Include="..\festas da aldeia\Data\ApplicationDbContext.cs" Link="Shared\Data\ApplicationDbContext.cs" />
+    <Compile Include="..\festas da aldeia\Data\DbSeeder.cs" Link="Shared\Data\DbSeeder.cs" />
     <Compile Include="..\festas da aldeia\Models\Artista.cs" Link="Shared\Models\Artista.cs" />
     <Compile Include="..\festas da aldeia\Models\Cartaz.cs" Link="Shared\Models\Cartaz.cs" />
     <Compile Include="..\festas da aldeia\Models\Evento.cs" Link="Shared\Models\Evento.cs" />
