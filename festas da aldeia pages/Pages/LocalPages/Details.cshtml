@@ -2,48 +2,160 @@
 @model festas_da_aldeia_pages.Pages.LocalPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Local";
 }
 
-<h1>Details</h1>
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        
+        <div class="mb-4">
+            <a asp-page="./Index" class="back-link">
+                <i class="bi bi-arrow-left"></i> Voltar aos Locais
+            </a>
+        </div>
 
-<div>
-    <h4>Local</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Local.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Local.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Local.Descricao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Local.Descricao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Local.Outside)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Local.Outside)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Local.Coordenadas)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Local.Coordenadas)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Local.Eventos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Local.Eventos)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Local.IdLocal">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+        <div class="page-header-container d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+            <div>
+                <h1 class="page-title-gradient mb-1">@Model.Local.Nome</h1>
+                <p class="text-muted mb-0">Ficha informativa sobre o recinto das festividades.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a asp-page="./Edit" asp-route-id="@Model.Local.IdLocal" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Editar Detalhes
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Coluna de Informações -->
+            <div class="col-md-7">
+                <div class="info-sheet">
+                    <div class="info-item pt-0">
+                        <div class="info-label">Nome do Recinto</div>
+                        <div class="info-value fw-bold text-primary">@Model.Local.Nome</div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Tipo de Espaço</div>
+                        <div class="info-value">
+                            <span class="badge-custom @(Model.Local.Outside ? "badge-outdoor" : "badge-indoor")">
+                                <i class="bi @(Model.Local.Outside ? "bi-sun-fill" : "bi-door-closed-fill")"></i>
+                                @(Model.Local.Outside ? "Exterior (Ao ar livre)" : "Interior (Recinto fechado)")
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-label">Descrição</div>
+                        <div class="info-value">
+                            @if (!string.IsNullOrEmpty(Model.Local.Descricao))
+                            {
+                                <p class="mb-0 text-secondary" style="white-space: pre-line;">@Model.Local.Descricao</p>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Nenhuma descrição fornecida para este local.</span>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="info-item pb-0">
+                        <div class="info-label mb-3">Eventos Programados neste Local</div>
+                        <div class="info-value">
+                            @if (Model.Local.Eventos != null && Model.Local.Eventos.Any())
+                            {
+                                <div class="row row-cols-1 g-2">
+                                    @foreach (var evento in Model.Local.Eventos)
+                                    {
+                                        <div class="col">
+                                            <div class="p-3 bg-light rounded-3 border d-flex justify-content-between align-items-center">
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="bi bi-calendar-event text-primary"></i>
+                                                    <div>
+                                                        <span class="fw-semibold text-dark d-block">@evento.Nome</span>
+                                                        <span class="text-muted small">@evento.DataInicio.ToString("g")</span>
+                                                    </div>
+                                                </div>
+                                                <a asp-page="/EventoPages/Details" asp-route-id="@evento.IdEvento" class="btn btn-action-sm" title="Ver Evento">
+                                                    <i class="bi bi-arrow-right"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="p-3 bg-light rounded-3 border border-dashed text-center">
+                                    <span class="text-muted fst-italic">Sem eventos agendados para este recinto.</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Coluna de Localização e Mapa -->
+            <div class="col-md-5">
+                <div class="card card-custom h-100">
+                    <div class="card-body-custom d-flex flex-column justify-content-between h-100">
+                        <div>
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <i class="bi bi-geo-fill text-primary" style="font-size: 1.25rem;"></i>
+                                <h5 class="fw-bold mb-0">Localização Geográfica</h5>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(Model.Local.Coordenadas))
+                            {
+                                <p class="text-muted small mb-4">Coordenadas registadas: <code class="bg-light p-1 rounded">@Model.Local.Coordenadas</code></p>
+                                
+                                @if (Model.Local.Coordenadas.StartsWith("http"))
+                                {
+                                    <!-- Se for um link de mapa completo, fornecemos um botão e iframe simulado -->
+                                    <div class="map-placeholder mb-4">
+                                        <div class="map-placeholder-bg"></div>
+                                        <i class="bi bi-map text-primary mb-2" style="font-size: 2.5rem; z-index: 1;"></i>
+                                        <span class="fw-semibold z-index-1 text-dark">Mapa de Localização</span>
+                                        <span class="text-muted small z-index-1 mb-3">Link externo fornecido</span>
+                                        <a href="@Model.Local.Coordenadas" target="_blank" rel="noopener" class="btn btn-sm btn-primary z-index-1">
+                                            <i class="bi bi-box-arrow-up-right"></i> Abrir no Google Maps
+                                        </a>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <!-- Se for no formato latitude,longitude, geramos um iframe em tempo real -->
+                                    var coords = Model.Local.Coordenadas.Trim();
+                                    <div class="rounded-3 overflow-hidden border mb-4 shadow-sm" style="height: 250px;">
+                                        <iframe 
+                                            width="100%" 
+                                            height="100%" 
+                                            frameborder="0" 
+                                            style="border:0" 
+                                            src="https://maps.google.com/maps?q=@(coords)&z=15&output=embed" 
+                                            allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="map-placeholder mb-4">
+                                    <div class="map-placeholder-bg"></div>
+                                    <i class="bi bi-map-fill text-muted mb-2" style="font-size: 2.5rem; z-index: 1;"></i>
+                                    <span class="fw-semibold text-dark z-index-1">Nenhum mapa disponível</span>
+                                    <span class="text-muted small z-index-1">As coordenadas não foram fornecidas.</span>
+                                </div>
+                            }
+                        </div>
+
+                        <div class="pt-3 border-top mt-auto text-center">
+                            <span class="text-muted small"><i class="bi bi-info-circle me-1"></i>Última atualização do sistema: @DateTime.Now.Year</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>

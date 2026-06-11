@@ -1,58 +1,85 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="pt">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - festas_da_aldeia_pages</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Festas da Aldeia</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/festas_da_aldeia_pages.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+    <header class="sticky-top">
+        <nav class="navbar navbar-expand-sm navbar-dark navbar-custom border-bottom box-shadow">
             <div class="container">
-                <a class="navbar-brand" asp-area="" asp-page="/Index">festas_da_aldeia_pages</a>
+                <a class="navbar-brand d-flex align-items-center" asp-area="" asp-page="/Index">
+                    <span class="brand-badge me-2"><i class="bi bi-stars"></i></span>
+                    <span class="fw-bold tracking-tight">Festas da Aldeia</span>
+                </a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                    <ul class="navbar-nav flex-grow-1 nav-links-custom ms-lg-4">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-page="/Index">
+                                <i class="bi bi-house-door me-1"></i> Início
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-page="/ArtistaPages/index">
+                                <i class="bi bi-people me-1"></i> Artistas
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/ArtistaPages/index">Artista</a>
+                            <a class="nav-link" asp-area="" asp-page="/cartazPages/index">
+                                <i class="bi bi-file-music me-1"></i> Cartazes
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/cartazPages/index">Cartazes</a>
+                            <a class="nav-link" asp-area="" asp-page="/EventoPages/index">
+                                <i class="bi bi-calendar-event me-1"></i> Eventos
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/EventoPages/index">Eventos</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/LocalPages/index">Locais</a>
+                            <a class="nav-link" asp-area="" asp-page="/LocalPages/index">
+                                <i class="bi bi-geo-alt me-1"></i> Locais
+                            </a>
                         </li>
                     </ul>
-                    <partial name="_LoginPartial" />
+                    <div class="d-flex align-items-center">
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container main-content-container">
+        <main role="main" class="pb-5 pt-4">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - festas_da_aldeia_pages - <a asp-area="" asp-page="/Privacy">Privacy</a>
+    <footer class="border-top footer-custom py-4 mt-auto">
+        <div class="container text-center text-md-between d-md-flex justify-content-between align-items-center">
+            <div class="mb-2 mb-md-0">
+                <span class="fw-semibold">&copy; 2026 - Festas da Aldeia</span>
+            </div>
+            <div class="footer-links">
+                <span class="text-muted me-3">Fontes: <a href="https://fonts.google.com/specimen/Plus+Jakarta+Sans" target="_blank" rel="noopener">Plus Jakarta Sans</a></span>
+                <span class="text-muted me-3">Ícones: <a href="https://icons.getbootstrap.com/" target="_blank" rel="noopener">Bootstrap Icons</a></span>
+                <a class="text-decoration-none" asp-area="" asp-page="/Privacy">Privacidade</a>
+            </div>
         </div>
     </footer>
 

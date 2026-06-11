@@ -23,7 +23,7 @@ public class DetailsModel : PageModel
             return NotFound();
         }
 
-        var local = await _context.Locais.FirstOrDefaultAsync(m => m.IdLocal == id);
+        var local = await _context.Locais.Include(l => l.Eventos).FirstOrDefaultAsync(m => m.IdLocal == id);
         if (local is null)
         {
             return NotFound();
