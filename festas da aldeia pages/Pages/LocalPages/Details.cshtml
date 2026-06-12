@@ -20,9 +20,12 @@
                 <p class="text-muted mb-0">Ficha informativa sobre o recinto das festividades.</p>
             </div>
             <div class="d-flex gap-2">
-                <a asp-page="./Edit" asp-route-id="@Model.Local.IdLocal" class="btn btn-outline-primary">
-                    <i class="bi bi-pencil"></i> Editar Detalhes
-                </a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-page="./Edit" asp-route-id="@Model.Local.IdLocal" class="btn btn-outline-primary">
+                        <i class="bi bi-pencil"></i> Editar Detalhes
+                    </a>
+                }
             </div>
         </div>
 

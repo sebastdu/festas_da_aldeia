@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,7 @@ using festas_da_aldeia.Data;
 
 namespace festas_da_aldeia_pages.Pages.EventoPages;
 
+[Authorize(Roles = "Admin")]
 public class EditModel : PageModel
 {
     private readonly ApplicationDbContext _context;

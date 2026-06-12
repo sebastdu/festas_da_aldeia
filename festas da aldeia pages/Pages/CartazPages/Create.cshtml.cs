@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -7,6 +8,7 @@ using festas_da_aldeia.Data;
 
 namespace festas_da_aldeia_pages.Pages.CartazPages;
 
+[Authorize(Roles = "Admin")]
 public class CreateModel : PageModel
 {
     private readonly ApplicationDbContext _context;

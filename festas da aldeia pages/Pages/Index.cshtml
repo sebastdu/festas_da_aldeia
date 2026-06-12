@@ -1,10 +1,233 @@
-﻿@page
+@page
 @model IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Início - RallyFestas";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Banner Section -->
+<div class="position-relative overflow-hidden rounded-4 mb-5 shadow-lg" 
+     style="background: linear-gradient(135deg, rgba(15, 23, 42, 0.92), rgba(79, 70, 229, 0.35)), url('/imagens/banner.png') no-repeat center center; background-size: cover; min-height: 400px; display: flex; align-items: center;">
+    <div class="container p-4 p-md-5 text-white">
+        <div class="row align-items-center">
+            <div class="col-lg-8 text-center text-lg-start">
+                <span class="badge bg-primary bg-opacity-25 text-light border border-primary border-opacity-50 px-3 py-2 rounded-pill mb-3 fw-bold uppercase tracking-wider small">
+                    <i class="bi bi-stars me-1 text-warning"></i> O Maior Festival de Sempre
+                </span>
+                <h1 class="display-3 fw-extrabold mb-3 tracking-tight text-white leading-none">
+                    Bem-vindo ao <span class="text-primary-gradient" style="background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RallyFestas</span>
+                </h1>
+                <p class="lead text-white-50 fs-5 mb-4 max-w-xl mx-auto mx-lg-0">
+                    Arranca para a tradição! Faz o teu rally por recintos, palcos e tasquinhas. Atesta o convívio com música ao vivo e gastronomia local, e planeia já a tua próxima etapa.
+                </p>
+                <div class="d-flex flex-column flex-sm-row justify-content-center justify-content-lg-start gap-3">
+                    <a asp-page="/EventoPages/index" class="btn btn-primary btn-lg px-4 py-3 shadow">
+                        <i class="bi bi-calendar-event"></i> Ver Agenda Completa
+                    </a>
+                    <a asp-page="/LocalPages/index" class="btn btn-outline-light btn-lg px-4 py-3">
+                        <i class="bi bi-geo-alt"></i> Explorar Recintos
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-4 d-none d-lg-block text-center">
+                <img src="/imagens/RallyFestas_logo_nobg.png" alt="RallyFestas Logo" class="img-fluid floating-logo" style="max-height: 250px; filter: drop-shadow(0 10px 25px rgba(99, 102, 241, 0.4));">
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Stats Counter Grid Section -->
+<div class="row g-4 mb-5">
+    <div class="col-md-4">
+        <div class="card card-custom h-100 text-center py-4 border-0 shadow-sm" style="background: linear-gradient(to bottom, #ffffff, #f8fafc);">
+            <div class="card-body-custom d-flex flex-column align-items-center">
+                <div class="card-icon-container bg-primary-subtle text-primary border rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-people-fill fs-3"></i>
+                </div>
+                <h2 class="display-5 fw-extrabold text-dark mb-1">@Model.TotalArtistas</h2>
+                <p class="text-muted fw-semibold uppercase tracking-wider small mb-0">Artistas Confirmados</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom h-100 text-center py-4 border-0 shadow-sm" style="background: linear-gradient(to bottom, #ffffff, #f8fafc);">
+            <div class="card-body-custom d-flex flex-column align-items-center">
+                <div class="card-icon-container bg-success-subtle text-success border rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-calendar-check-fill fs-3"></i>
+                </div>
+                <h2 class="display-5 fw-extrabold text-dark mb-1">@Model.TotalEventos</h2>
+                <p class="text-muted fw-semibold uppercase tracking-wider small mb-0">Eventos na Agenda</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card card-custom h-100 text-center py-4 border-0 shadow-sm" style="background: linear-gradient(to bottom, #ffffff, #f8fafc);">
+            <div class="card-body-custom d-flex flex-column align-items-center">
+                <div class="card-icon-container bg-info-subtle text-info border rounded-circle mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-geo-alt-fill fs-3"></i>
+                </div>
+                <h2 class="display-5 fw-extrabold text-dark mb-1">@Model.TotalLocais</h2>
+                <p class="text-muted fw-semibold uppercase tracking-wider small mb-0">Recintos & Palcos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Highlights Content (2 Columns Grid) -->
+<div class="row g-5">
+    
+    <!-- Left Column: Upcoming Events -->
+    <div class="col-lg-7">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-extrabold text-dark mb-1"><i class="bi bi-calendar-event me-2 text-primary"></i>Hoje e Brevemente</h2>
+                <p class="text-muted mb-0 small">Os próximos espetáculos imperdíveis na aldeia.</p>
+            </div>
+            <a asp-page="/EventoPages/index" class="text-decoration-none fw-bold small back-link">
+                Ver Todos <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        
+        @if (!Model.EventosProximos.Any())
+        {
+            <div class="card-custom text-center py-5 border-dashed">
+                <div class="card-body-custom">
+                    <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">Sem eventos futuros agendados</h5>
+                    <p class="text-muted small">Por favor, volte mais tarde para consultar novas atualizações.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-4">
+                @foreach (var ev in Model.EventosProximos)
+                {
+                    <div class="card card-custom border-light-subtle shadow-sm transition-all hover-translate-y">
+                        <div class="card-body-custom p-4">
+                            <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
+                                <div>
+                                    <h4 class="fw-bold mb-1">@ev.Nome</h4>
+                                    <span class="small text-muted">
+                                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>
+                                        @if (ev.Local != null)
+                                        {
+                                            <strong class="text-dark">@ev.Local.Nome</strong>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Sem Local definido</span>
+                                        }
+                                    </span>
+                                </div>
+                                <span class="badge bg-light text-dark border py-2 px-3 rounded-pill fw-semibold small">
+                                    <i class="bi bi-clock me-1 text-warning"></i>
+                                    @ev.DataInicio.ToString("HH:mm")
+                                </span>
+                            </div>
+                            
+                            @if (!string.IsNullOrEmpty(ev.Descricao))
+                            {
+                                <p class="text-muted small mb-3">@ev.Descricao</p>
+                            }
+                            
+                            <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                <span class="badge-custom badge-duration text-dark fw-semibold">
+                                    <i class="bi bi-calendar3 text-primary"></i>
+                                    @ev.DataInicio.ToString("dd 'de' MMMM")
+                                </span>
+                                <a asp-page="/EventoPages/Details" asp-route-id="@ev.IdEvento" class="btn btn-outline-primary btn-sm px-3">
+                                    Ver Alinhamento <i class="bi bi-chevron-right small"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+    
+    <!-- Right Column: Recintos & Palcos -->
+    <div class="col-lg-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-extrabold text-dark mb-1"><i class="bi bi-geo-alt me-2 text-success"></i>Explorar Recintos</h2>
+                <p class="text-muted mb-0 small">Onde a magia e a festa acontecem.</p>
+            </div>
+            <a asp-page="/LocalPages/index" class="text-decoration-none fw-bold small back-link">
+                Ver Todos <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+        
+        @if (!Model.LocaisPrincipais.Any())
+        {
+            <div class="card-custom text-center py-5 border-dashed">
+                <div class="card-body-custom">
+                    <i class="bi bi-geo-alt fs-1 text-muted mb-3 d-block"></i>
+                    <h5 class="fw-bold">Nenhum recinto registado</h5>
+                    <p class="text-muted small">Os palcos e recintos serão anunciados em breve.</p>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-3">
+                @foreach (var loc in Model.LocaisPrincipais)
+                {
+                    <div class="card card-custom shadow-sm">
+                        <div class="card-body-custom p-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="card-icon-container bg-light border m-0" style="width: 48px; height: 48px; flex-shrink: 0;">
+                                    @if (loc.Outside)
+                                    {
+                                        <i class="bi bi-tree-fill text-success"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-house-door-fill text-primary"></i>
+                                    }
+                                </div>
+                                <div class="flex-grow-1 min-w-0">
+                                    <h5 class="fw-bold text-truncate mb-1">@loc.Nome</h5>
+                                    <span class="badge-custom @(loc.Outside ? "badge-outdoor" : "badge-indoor") py-1 px-2">
+                                        @(loc.Outside ? "Exterior" : "Interior")
+                                    </span>
+                                </div>
+                                <div>
+                                    <a asp-page="/LocalPages/Details" asp-route-id="@loc.IdLocal" class="btn btn-action-sm details" title="Ver Detalhes">
+                                        <i class="bi bi-chevron-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+/* Micro-animation for floating logo in hero banner */
+.floating-logo {
+    animation: float 4s ease-in-out infinite;
+}
+
+@@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(0px); }
+}
+
+.border-dashed {
+    border: 2px dashed var(--border-light) !important;
+    background: transparent !important;
+}
+
+.transition-all {
+    transition: all var(--transition-normal);
+}
+
+.hover-translate-y:hover {
+    transform: translateY(-2px);
+}
+</style>
