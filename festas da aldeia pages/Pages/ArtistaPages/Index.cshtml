@@ -7,9 +7,12 @@
 
 <h1>Index</h1>
 
-<p>
-    <a asp-page="Create">Create New</a>
-</p>
+@if (User.IsInRole("Admin"))
+{
+    <p>
+        <a asp-page="Create">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -50,9 +53,15 @@
                 @Html.DisplayFor(model => item.Cartazes)
             </td>
             <td>
-                <a asp-page="./Edit" asp-route-id="@item.IdArtista">Edit</a> |
-                <a asp-page="./Details" asp-route-id="@item.IdArtista">Details</a> |
-                <a asp-page="./Delete" asp-route-id="@item.IdArtista">Delete</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    <a asp-page="./Edit" asp-route-id="@item.IdArtista">Edit</a> @:|
+                }
+                <a asp-page="./Details" asp-route-id="@item.IdArtista">Details</a>
+                @if (User.IsInRole("Admin"))
+                {
+                    @:| <a asp-page="./Delete" asp-route-id="@item.IdArtista">Delete</a>
+                }
             </td>
         </tr>
 }
