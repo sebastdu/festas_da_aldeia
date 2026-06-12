@@ -2,74 +2,101 @@
 @model festas_da_aldeia_pages.Pages.CartazPages.IndexModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Cartazes";
 }
 
-<h1>Index</h1>
+<div class="page-header-container d-flex justify-content-between align-items-center flex-wrap gap-2">
+    <div>
+        <h1 class="page-title-gradient mb-1"><i class="bi bi-file-music me-2"></i>Cartazes</h1>
+        <p class="text-muted mb-0" style="font-size:0.95rem;">Programa de atuações por evento</p>
+    </div>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-page="Create" class="btn btn-primary">
+            <i class="bi bi-plus-lg"></i> Nova Atuação
+        </a>
+    }
+</div>
 
-@if (User.IsInRole("Admin"))
+@if (!Model.Cartaz.Any())
 {
-    <p>
-        <a asp-page="Create">Create New</a>
-    </p>
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-file-music" style="font-size:3rem; opacity:0.3;"></i>
+        <p class="mt-3">Ainda não existem atuações registadas.</p>
+        @if (User.IsInRole("Admin"))
+        {
+            <a asp-page="Create" class="btn btn-primary mt-2"><i class="bi bi-plus-lg"></i> Adicionar primeira atuação</a>
+        }
+    </div>
 }
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].DataHoraAtuacao)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].DuracaoMinutos)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].IdEvento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].Evento)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].IdArtista)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Cartaz[0].Artista)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model.Cartaz) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.DataHoraAtuacao)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.DuracaoMinutos)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.IdEvento)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Evento)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.IdArtista)
-            </td>
-            <td>
-                @Html.DisplayFor(model => item.Artista)
-            </td>
-            <td>
-                @if (User.IsInRole("Admin"))
+else
+{
+    <div class="table-custom-wrapper">
+        <table class="table table-custom table-hover mb-0">
+            <thead>
+                <tr>
+                    <th><i class="bi bi-calendar-event me-1"></i>Data e Hora</th>
+                    <th><i class="bi bi-clock me-1"></i>Duração</th>
+                    <th><i class="bi bi-person me-1"></i>Artista</th>
+                    <th><i class="bi bi-calendar2 me-1"></i>Evento</th>
+                    <th class="text-center">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Cartaz)
                 {
-                    <a asp-page="./Edit" asp-route-id="@item.IdCartaz">Edit</a> @:|
+                    <tr>
+                        <td>
+                            <span class="fw-semibold">@item.DataHoraAtuacao.ToString("dd/MM/yyyy")</span>
+                            <span class="text-muted ms-2" style="font-size:0.9rem;">@item.DataHoraAtuacao.ToString("HH:mm")</span>
+                        </td>
+                        <td>
+                            <span class="badge-custom badge-duration">
+                                <i class="bi bi-clock"></i> @item.DuracaoMinutos min
+                            </span>
+                        </td>
+                        <td>
+                            @if (item.Artista != null)
+                            {
+                                <span class="fw-semibold">@item.Artista.Nome</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+                        <td>
+                            @if (item.Evento != null)
+                            {
+                                <span>@item.Evento.Nome</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a asp-page="./Details" asp-route-id="@item.IdCartaz"
+                                       class="btn-action-sm details" title="Detalhes">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-page="./Edit" asp-route-id="@item.IdCartaz"
+                                           class="btn-action-sm" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-page="./Delete" asp-route-id="@item.IdCartaz"
+                                           class="btn-action-sm delete" title="Eliminar">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
                 }
-                <a asp-page="./Details" asp-route-id="@item.IdCartaz">Details</a>
-                @if (User.IsInRole("Admin"))
-                {
-                    @:| <a asp-page="./Delete" asp-route-id="@item.IdCartaz">Delete</a>
-                }
-            </td>
-        </tr>
+            </tbody>
+        </table>
+    </div>
 }
-    </tbody>
-</table>

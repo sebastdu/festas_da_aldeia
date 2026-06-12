@@ -2,48 +2,123 @@
 @model festas_da_aldeia_pages.Pages.ArtistaPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes do Artista";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Artista</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Artista.Nome)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Artista.Nome)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Artista.Biografia)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Artista.Biografia)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Artista.Contacto)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Artista.Contacto)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Artista.LinkFotoPerfil)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Artista.LinkFotoPerfil)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Artista.Cartazes)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Artista.Cartazes)
-        </dd>
-    </dl>
+<div class="page-header-container">
+    <a asp-page="./Index" class="back-link mb-3 d-inline-flex">
+        <i class="bi bi-arrow-left"></i> Voltar à lista
+    </a>
+    <h1 class="page-title-gradient mb-1"><i class="bi bi-person-badge me-2"></i>Detalhes do Artista</h1>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Artista.IdArtista">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+
+<div class="row g-4">
+    <div class="col-lg-7 col-md-9">
+        <div class="info-sheet">
+            @if (!string.IsNullOrEmpty(Model.Artista.LinkFotoPerfil))
+            {
+                var imgUrl = Model.Artista.LinkFotoPerfil;
+                if (!imgUrl.StartsWith("http://") && !imgUrl.StartsWith("https://"))
+                    imgUrl = "https://" + imgUrl;
+                <div class="text-center mb-4">
+                    <img src="@imgUrl" alt="@Model.Artista.Nome"
+                         style="width:100px;height:100px;border-radius:50%;object-fit:cover;border:3px solid var(--border-light);box-shadow:var(--shadow-md);"
+                         onerror="this.style.display='none';" />
+                </div>
+            }
+
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-person me-1"></i>@Html.DisplayNameFor(m => m.Artista.Nome)</div>
+                <div class="info-value">@Html.DisplayFor(m => m.Artista.Nome)</div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-chat-text me-1"></i>@Html.DisplayNameFor(m => m.Artista.Biografia)</div>
+                <div class="info-value">
+                    @if (!string.IsNullOrEmpty(Model.Artista.Biografia))
+                    {
+                        @Html.DisplayFor(m => m.Artista.Biografia)
+                    }
+                    else
+                    {
+
+                        <span class="text-muted fst-italic">Sem biografia</span>
+                    }
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-telephone me-1"></i>@Html.DisplayNameFor(m => m.Artista.Contacto)</div>
+                <div class="info-value">
+                    @if (!string.IsNullOrEmpty(Model.Artista.Contacto))
+                    {
+                        @Html.DisplayFor(m => m.Artista.Contacto)
+                    }
+                    else
+                    {
+
+                        <span class="text-muted fst-italic">Sem contacto</span>
+                    }
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-image me-1"></i>@Html.DisplayNameFor(m => m.Artista.LinkFotoPerfil)</div>
+                <div class="info-value">
+                    @if (!string.IsNullOrEmpty(Model.Artista.LinkFotoPerfil))
+                    {
+                        <a href="@Model.Artista.LinkFotoPerfil" target="_blank" class="text-primary text-decoration-none">
+                            <i class="bi bi-link-45deg me-1"></i>Ver foto
+                        </a>
+                    }
+                    else
+                    {
+
+                        <span class="text-muted fst-italic">Sem foto</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @if (Model.Artista.Cartazes != null && Model.Artista.Cartazes.Any())
+        {
+            <div class="mt-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-file-music me-2 text-primary"></i>Atuações (@Model.Artista.Cartazes.Count)</h5>
+                <div class="table-custom-wrapper">
+                    <table class="table table-custom mb-0">
+                        <thead>
+                            <tr>
+                                <th>Evento</th>
+                                <th>Data e Hora</th>
+                                <th>Duração</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cartaz in Model.Artista.Cartazes.OrderBy(c => c.DataHoraAtuacao))
+                            {
+                                <tr>
+                                    <td>@(cartaz.Evento?.Nome ?? "—")</td>
+                                    <td>@cartaz.DataHoraAtuacao.ToString("dd/MM/yyyy HH:mm")</td>
+                                    <td><span class="badge-custom badge-duration"><i class="bi bi-clock"></i> @cartaz.DuracaoMinutos min</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        }
+
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="d-flex gap-2 mt-3">
+                <a asp-page="./Edit" asp-route-id="@Model.Artista.IdArtista" class="btn btn-primary">
+                    <i class="bi bi-pencil me-1"></i> Editar
+                </a>
+                <a asp-page="./Delete" asp-route-id="@Model.Artista.IdArtista" class="btn btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i> Eliminar
+                </a>
+            </div>
+        }
+    </div>
 </div>
