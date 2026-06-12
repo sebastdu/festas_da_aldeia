@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using festas_da_aldeia.Models;
 using festas_da_aldeia.Data;
 
@@ -18,6 +19,9 @@ public class EditModel : PageModel
     [BindProperty]
     public Cartaz Cartaz { get; set; } = default!;
 
+    public SelectList ArtistasSelectList { get; set; } = default!;
+    public SelectList EventosSelectList { get; set; } = default!;
+
     public async Task<IActionResult> OnGetAsync(int? id)
     {
         if (id is null)
@@ -31,6 +35,8 @@ public class EditModel : PageModel
             return NotFound();
         }
         Cartaz = cartaz;
+        ArtistasSelectList = new SelectList(_context.Artistas, "IdArtista", "Nome");
+        EventosSelectList = new SelectList(_context.Eventos, "IdEvento", "Nome");
         return Page();
     }
 
@@ -38,8 +44,13 @@ public class EditModel : PageModel
     // For more details, see https://aka.ms/RazorPagesCRUD.
     public async Task<IActionResult> OnPostAsync()
     {
+        ModelState.Remove("Cartaz.Artista");
+        ModelState.Remove("Cartaz.Evento");
+
         if (!ModelState.IsValid)
         {
+            ArtistasSelectList = new SelectList(_context.Artistas, "IdArtista", "Nome");
+            EventosSelectList = new SelectList(_context.Eventos, "IdEvento", "Nome");
             return Page();
         }
 

@@ -2,54 +2,76 @@
 @model festas_da_aldeia_pages.Pages.CartazPages.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Atuação";
 }
 
-<h1>Details</h1>
-
-<div>
-    <h4>Cartaz</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.DataHoraAtuacao)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.DataHoraAtuacao)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.DuracaoMinutos)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.DuracaoMinutos)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.IdEvento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.IdEvento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.Evento)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.Evento)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.IdArtista)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.IdArtista)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Cartaz.Artista)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Cartaz.Artista)
-        </dd>
-    </dl>
+<div class="page-header-container">
+    <a asp-page="./Index" class="back-link mb-3 d-inline-flex">
+        <i class="bi bi-arrow-left"></i> Voltar à lista
+    </a>
+    <h1 class="page-title-gradient mb-1"><i class="bi bi-file-music me-2"></i>Detalhes da Atuação</h1>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Cartaz.IdCartaz">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+
+<div class="row">
+    <div class="col-lg-7 col-md-9">
+        <div class="info-sheet">
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-person me-1"></i>Artista</div>
+                <div class="info-value">
+                    @if (Model.Cartaz.Artista != null)
+                    {
+                        <a asp-page="/ArtistaPages/Details" asp-route-id="@Model.Cartaz.Artista.IdArtista"
+                               class="text-decoration-none fw-semibold">
+                            @Model.Cartaz.Artista.Nome
+                        </a>
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">—</span>
+                    }
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-calendar2 me-1"></i>Evento</div>
+                <div class="info-value">
+                    @if (Model.Cartaz.Evento != null)
+                    {
+                        <span class="fw-semibold">@Model.Cartaz.Evento.Nome</span>
+                    }
+                    else
+                    {
+                        <span class="text-muted fst-italic">—</span>
+                    }
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-calendar-event me-1"></i>@Html.DisplayNameFor(m => m.Cartaz.DataHoraAtuacao)</div>
+                <div class="info-value">
+                    @Model.Cartaz.DataHoraAtuacao.ToString("dd 'de' MMMM 'de' yyyy 'às' HH:mm", new System.Globalization.CultureInfo("pt-PT"))
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="info-label"><i class="bi bi-clock me-1"></i>@Html.DisplayNameFor(m => m.Cartaz.DuracaoMinutos)</div>
+                <div class="info-value">
+                    <span class="badge-custom badge-duration">
+                        <i class="bi bi-clock"></i> @Model.Cartaz.DuracaoMinutos minutos
+                    </span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <a asp-page="./Edit" asp-route-id="@Model.Cartaz.IdCartaz" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            <a asp-page="./Delete" asp-route-id="@Model.Cartaz.IdCartaz" class="btn btn-outline-danger">
+                <i class="bi bi-trash me-1"></i> Eliminar
+            </a>
+        </div>
+    </div>
 </div>
