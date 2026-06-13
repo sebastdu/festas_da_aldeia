@@ -1,5 +1,6 @@
 @page
 @model IndexModel
+@using System.Text.Json
 @{
     ViewData["Title"] = "Início - RallyFestas";
 }
@@ -10,9 +11,6 @@
     <div class="container p-4 p-md-5 text-white">
         <div class="row align-items-center">
             <div class="col-lg-8 text-center text-lg-start">
-                <span class="badge bg-primary bg-opacity-25 text-light border border-primary border-opacity-50 px-3 py-2 rounded-pill mb-3 fw-bold uppercase tracking-wider small">
-                    <i class="bi bi-stars me-1 text-warning"></i> O Maior Festival de Sempre
-                </span>
                 <h1 class="display-3 fw-extrabold mb-3 tracking-tight text-white leading-none">
                     Bem-vindo ao <span class="text-primary-gradient" style="background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RallyFestas</span>
                 </h1>
@@ -67,6 +65,38 @@
                 </div>
                 <h2 class="display-5 fw-extrabold text-dark mb-1">@Model.TotalLocais</h2>
                 <p class="text-muted fw-semibold uppercase tracking-wider small mb-0">Recintos & Palcos</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Map Section -->
+<div class="card card-custom mb-5 shadow-sm border-0">
+    <div class="card-body-custom p-4">
+        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-4">
+            <div>
+                <h2 class="fw-extrabold text-dark mb-1">
+                    <i class="bi bi-map me-2 text-primary"></i>RallyMapa das Festas
+                </h2>
+                <p class="text-muted mb-0 small">Encontra os recintos e vê onde estão a decorrer as festividades da aldeia.</p>
+            </div>
+            <div>
+                <button id="btn-geolocation" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-geo-alt-fill"></i> Obter Minha Localização
+                </button>
+            </div>
+        </div>
+        
+        <!-- Map Container -->
+        <div class="position-relative rounded-3 overflow-hidden border" style="height: 450px; background-color: #e2e8f0; z-index: 1;">
+            <div id="map" style="height: 100%; width: 100%;"></div>
+            
+            <!-- Notice overlay if geolocation status changes -->
+            <div id="map-notice" class="position-absolute bottom-0 start-0 m-3 p-2 bg-white rounded shadow-sm d-none" style="z-index: 1000; max-width: 280px; font-size: 0.85rem; border: 1px solid var(--border-light);">
+                <span class="text-secondary"><i class="bi bi-info-circle me-1 text-primary"></i> <span id="map-notice-text"></span></span>
             </div>
         </div>
     </div>
@@ -230,4 +260,254 @@
 .hover-translate-y:hover {
     transform: translateY(-2px);
 }
+
+/* Leaflet map improvements to match page style */
+#map {
+    z-index: 10;
+}
+.leaflet-popup-content-wrapper {
+    border-radius: var(--radius-md) !important;
+    box-shadow: var(--shadow-lg) !important;
+    border: 1px solid var(--border-light) !important;
+}
+.leaflet-popup-tip {
+    box-shadow: var(--shadow-sm) !important;
+}
+.leaflet-popup-content {
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
+    color: var(--text-main) !important;
+    margin: 12px 16px !important;
+}
+.leaflet-popup-content h6 {
+    font-size: 0.95rem;
+}
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 0.15em;
+}
 </style>
+
+@section Scripts {
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <script>
+        // Dados dos eventos vindos do servidor
+        const mapEvents = @Html.Raw(JsonSerializer.Serialize(Model.EventosMapa));
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            let defaultLat = 39.6030;
+            let defaultLng = -8.4164;
+            let hasEvents = false;
+            
+            // Filtrar eventos válidos que tenham latitude e longitude válidas
+            const validEvents = [];
+            let latSum = 0;
+            let lngSum = 0;
+            
+            if (mapEvents && mapEvents.length > 0) {
+                mapEvents.forEach(e => {
+                    if (e.Coordenadas) {
+                        const parts = e.Coordenadas.split(',');
+                        if (parts.length === 2) {
+                            const lat = parseFloat(parts[0]);
+                            const lng = parseFloat(parts[1]);
+                            if (!isNaN(lat) && !isNaN(lng)) {
+                                validEvents.push({
+                                    ...e,
+                                    lat: lat,
+                                    lng: lng
+                                });
+                                latSum += lat;
+                                lngSum += lng;
+                            }
+                        }
+                    }
+                });
+            }
+            
+            if (validEvents.length > 0) {
+                defaultLat = latSum / validEvents.length;
+                defaultLng = lngSum / validEvents.length;
+                hasEvents = true;
+            }
+            
+            // Criar mapa
+            const map = L.map('map').setView([defaultLat, defaultLng], hasEvents ? 14 : 8);
+            
+            // Adicionar tile layer do OpenStreetMap (Mapnik)
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+            
+            // Criar icons personalizados
+            // Icon azul para o utilizador
+            const userIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+            
+            // Icon vermelho para eventos
+            const eventIcon = L.icon({
+                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+                iconSize: [25, 41],
+                iconAnchor: [12, 41],
+                popupAnchor: [1, -34],
+                shadowSize: [41, 41]
+            });
+            
+            // Adicionar marcadores dos eventos
+            const eventMarkers = [];
+            validEvents.forEach(e => {
+                const popupContent = `
+                    <div style="min-width: 180px;">
+                        <h6 class="fw-bold mb-1 text-primary" style="margin: 0 0 4px 0;">${e.Nome}</h6>
+                        <p class="text-muted small mb-2" style="margin: 0 0 8px 0; font-size: 0.8rem;">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>${e.LocalNome} (${e.IsOutside ? 'Exterior' : 'Interior'})
+                        </p>
+                        <p class="small mb-2 text-dark" style="margin: 0 0 8px 0; font-size: 0.85rem; line-height: 1.3;">
+                            ${e.Descricao ? e.Descricao : 'Sem descrição adicional.'}
+                        </p>
+                        <div class="border-top pt-2" style="font-size: 0.75rem; border-top: 1px solid var(--border-light); margin-top: 6px;">
+                            <div class="text-secondary"><i class="bi bi-calendar-event me-1 text-primary"></i>Início: ${formatarData(e.DataInicio)}</div>
+                            <div class="text-secondary"><i class="bi bi-calendar-check me-1 text-success"></i>Fim: ${formatarData(e.DataFim)}</div>
+                            <div class="mt-2 text-center">
+                                <a href="/EventoPages/Details?id=${e.IdEvento}" class="btn btn-outline-primary btn-sm w-100 py-1" style="font-size: 0.75rem; padding: 2px 8px; justify-content: center; gap: 4px;">
+                                    Detalhes <i class="bi bi-chevron-right small"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const marker = L.marker([e.lat, e.lng], { icon: eventIcon })
+                    .bindPopup(popupContent)
+                    .addTo(map);
+                    
+                eventMarkers.push(marker);
+            });
+            
+            // Se houver múltiplos eventos, ajustar a visualização do mapa para englobar todos eles
+            if (validEvents.length > 1) {
+                const group = new L.featureGroup(eventMarkers);
+                map.fitBounds(group.getBounds().pad(0.15));
+            } else if (validEvents.length === 1) {
+                map.setView([validEvents[0].lat, validEvents[0].lng], 15);
+            }
+            
+            // Variável para guardar o marcador do utilizador e círculo de precisão
+            let userMarker = null;
+            let userAccuracyCircle = null;
+            
+            // Configurar geolocalização do utilizador
+            const btnGeo = document.getElementById('btn-geolocation');
+            const mapNotice = document.getElementById('map-notice');
+            const mapNoticeText = document.getElementById('map-notice-text');
+            
+            function showNotice(msg) {
+                mapNoticeText.textContent = msg;
+                mapNotice.classList.remove('d-none');
+            }
+            
+            btnGeo.addEventListener('click', function () {
+                btnGeo.disabled = true;
+                const originalText = btnGeo.innerHTML;
+                btnGeo.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span> A obter...`;
+                
+                if (!navigator.geolocation) {
+                    showNotice("A geolocalização não é suportada por este navegador.");
+                    btnGeo.innerHTML = originalText;
+                    btnGeo.disabled = false;
+                    return;
+                }
+                
+                navigator.geolocation.getCurrentPosition(
+                    function (position) {
+                        const userLat = position.coords.latitude;
+                        const userLng = position.coords.longitude;
+                        const accuracy = position.coords.accuracy;
+                        
+                        // Remover marcador anterior se existir
+                        if (userMarker) {
+                            map.removeLayer(userMarker);
+                        }
+                        if (userAccuracyCircle) {
+                            map.removeLayer(userAccuracyCircle);
+                        }
+                        
+                        // Adicionar círculo de precisão
+                        userAccuracyCircle = L.circle([userLat, userLng], {
+                            radius: accuracy,
+                            color: '#3b82f6',
+                            fillColor: '#3b82f6',
+                            fillOpacity: 0.15,
+                            weight: 1
+                        }).addTo(map);
+                        
+                        // Adicionar marcador do utilizador
+                        userMarker = L.marker([userLat, userLng], { icon: userIcon })
+                            .bindPopup(`
+                                <div style="min-width: 140px; text-align: center;">
+                                    <h6 class="fw-bold mb-1 text-primary"><i class="bi bi-person-fill me-1"></i>A tua localização</h6>
+                                    <p class="text-muted small mb-0" style="font-size: 0.75rem;">Precisão: ~${Math.round(accuracy)} metros</p>
+                                </div>
+                            `)
+                            .addTo(map);
+                            
+                        // Centrar mapa na localização do utilizador
+                        map.setView([userLat, userLng], 15);
+                        
+                        btnGeo.innerHTML = `<i class="bi bi-geo-alt-fill"></i> Localização Atualizada`;
+                        btnGeo.disabled = false;
+                        btnGeo.classList.remove('btn-primary');
+                        btnGeo.classList.add('btn-success');
+                        
+                        showNotice("Localização obtida com sucesso!");
+                    },
+                    function (error) {
+                        console.error(error);
+                        let errMsg = "Não foi possível obter a sua localização.";
+                        switch (error.code) {
+                            case error.PERMISSION_DENIED:
+                                errMsg = "Permissão de geolocalização rejeitada pelo utilizador.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                errMsg = "A informação de localização está indisponível.";
+                                break;
+                            case error.TIMEOUT:
+                                errMsg = "Tempo limite atingido ao obter localização.";
+                                break;
+                        }
+                        showNotice(errMsg);
+                        btnGeo.innerHTML = originalText;
+                        btnGeo.disabled = false;
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+            
+            // Função auxiliar para formatar data ISO em formato legível português
+            function formatarData(isoString) {
+                if (!isoString) return "";
+                const data = new Date(isoString);
+                return data.toLocaleDateString('pt-PT', { 
+                    day: '2-digit', 
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            }
+        });
+    </script>
+}
