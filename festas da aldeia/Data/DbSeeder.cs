@@ -232,33 +232,120 @@ namespace festas_da_aldeia.Data
             }
 
             // 4. Seed Artistas (Artists)
-            if (!await context.Artistas.AnyAsync(a => a.Nome == "Quim Barreiros"))
+            var todosArtistas = new List<Artista>
             {
-                var artistas = new List<Artista>
+                new Artista
                 {
-                    new Artista
-                    {
-                        Nome = "Quim Barreiros",
-                        Biografia = "O mestre da música popular e brejeira portuguesa, famoso pelo acordeão e pelas suas letras de duplo sentido.",
-                        Contacto = "912345678",
-                        LinkFotoPerfil = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4"
-                    },
-                    new Artista
-                    {
-                        Nome = "Ana Malhoa",
-                        Biografia = "Cantora e performer de referência em Portugal, traz um espetáculo eletrizante repleto de pop e ritmos tropicais.",
-                        Contacto = "961234567",
-                        LinkFotoPerfil = "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
-                    },
-                    new Artista
-                    {
-                        Nome = "Rancho Folclórico da Região",
-                        Biografia = "Fundado há mais de 40 anos, preserva as danças, trajes e cantares típicos dos nossos antepassados rurais.",
-                        Contacto = "249123456",
-                        LinkFotoPerfil = "https://images.unsplash.com/photo-1482440308425-276ad0f28b19"
-                    }
-                };
-                await context.Artistas.AddRangeAsync(artistas);
+                    Nome = "Quim Barreiros",
+                    Biografia = "O mestre da música popular e brejeira portuguesa, famoso pelo acordeão e pelas suas letras de duplo sentido.",
+                    Contacto = "912345678",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4"
+                },
+                new Artista
+                {
+                    Nome = "Ana Malhoa",
+                    Biografia = "Cantora e performer de referência em Portugal, traz um espetáculo eletrizante repleto de pop e ritmos tropicais.",
+                    Contacto = "961234567",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1494790108377-be9c29b29330"
+                },
+                new Artista
+                {
+                    Nome = "Rancho Folclórico da Região",
+                    Biografia = "Fundado há mais de 40 anos, preserva as danças, trajes e cantares típicos dos nossos antepassados rurais.",
+                    Contacto = "249123456",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1482440308425-276ad0f28b19"
+                },
+                new Artista
+                {
+                    Nome = "Toy",
+                    Biografia = "Ícone da música popular portuguesa, conhecido por grandes êxitos de cariz romântico e festivo como 'Coração não tem idade'.",
+                    Contacto = "919999999",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1501386761578-eac5c94b800a"
+                },
+                new Artista
+                {
+                    Nome = "Rosinha",
+                    Biografia = "Cantora popular com concertos animados e cheios de humor, conhecida pelas suas canções com acordeão e refrões divertidos.",
+                    Contacto = "928888888",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1516450360452-9312f5e86fc7"
+                },
+                new Artista
+                {
+                    Nome = "Xutos & Pontapés",
+                    Biografia = "A maior banda de rock em Portugal, com uma carreira de mais de 40 anos repleta de hinos intemporais.",
+                    Contacto = "937777777",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1470225620780-dba8ba36b745"
+                },
+                new Artista
+                {
+                    Nome = "David Antunes & The Midnight Band",
+                    Biografia = "Banda de pop-rock e entretenimento carismática, conhecida pelas suas performances enérgicas e interativas.",
+                    Contacto = "916666666",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1506157786151-b8491531f063"
+                },
+                new Artista
+                {
+                    Nome = "Gisela João",
+                    Biografia = "Uma das vozes mais marcantes do fado contemporâneo, trazendo uma intensidade emocional e frescura ao fado tradicional.",
+                    Contacto = "965555555",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1534528741775-53994a69daeb"
+                },
+                new Artista
+                {
+                    Nome = "Miguel Araújo",
+                    Biografia = "Músico, compositor e cantor português, autor de algumas das canções mais conhecidas da pop e folk nacional.",
+                    Contacto = "914444444",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1507679799987-c73779587ccf"
+                },
+                new Artista
+                {
+                    Nome = "Bonga",
+                    Biografia = "Embaixador da música angolana e do semba, com uma voz inconfundível que contagia qualquer recinto de dança.",
+                    Contacto = "923333333",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1484755560693-a4074577af3a"
+                },
+                new Artista
+                {
+                    Nome = "The Gift",
+                    Biografia = "Banda pioneira do pop/indie eletrónico em Portugal, famosa pelas atuações teatrais da vocalista Sónia Tavares.",
+                    Contacto = "962222222",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae"
+                },
+                new Artista
+                {
+                    Nome = "Kura",
+                    Biografia = "Um dos DJs e produtores de música eletrónica portugueses mais reconhecidos internacionalmente.",
+                    Contacto = "911111111",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3"
+                },
+                new Artista
+                {
+                    Nome = "Augusto Canário & Amigos",
+                    Biografia = "Grupo de música tradicional e popular portuguesa, célebre pelas desgarradas e cantares ao desafio.",
+                    Contacto = "929292929",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1511192336575-5a79af67a629"
+                },
+                new Artista
+                {
+                    Nome = "Bandas Filarmónicas Reunidas",
+                    Biografia = "Agrupamento de músicos locais dedicados a manter vivas as marchas, hinos e clássicos filarmónicos nas festas da região.",
+                    Contacto = "249999999",
+                    LinkFotoPerfil = "https://images.unsplash.com/photo-1465847899084-d164df4dedc6"
+                }
+            };
+
+            var artistasParaInserir = new List<Artista>();
+            foreach (var artista in todosArtistas)
+            {
+                if (!await context.Artistas.AnyAsync(a => a.Nome == artista.Nome))
+                {
+                    artistasParaInserir.Add(artista);
+                }
+            }
+
+            if (artistasParaInserir.Any())
+            {
+                await context.Artistas.AddRangeAsync(artistasParaInserir);
                 await context.SaveChangesAsync();
             }
 
@@ -472,50 +559,71 @@ namespace festas_da_aldeia.Data
             }
 
             // 6. Seed Cartazes (Lineup)
-            // Verificamos se existem cartazes para os eventos seeded para evitar duplicações
-            var concertoAbertura = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Concerto de Abertura"));
-            var arraialPopular = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Arraial Popular"));
-            var tardeTradicao = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains("Tarde de Cantares"));
-
-            if (concertoAbertura != null && arraialPopular != null && tardeTradicao != null)
+            var specs = new List<(string EventoQuery, string ArtistaQuery, TimeSpan Offset, int Duracao)>
             {
-                bool hasLineup = await context.Cartazes.AnyAsync(c => c.IdEvento == concertoAbertura.IdEvento || c.IdEvento == arraialPopular.IdEvento);
-                if (!hasLineup)
-                {
-                    var quimBarreiros = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Quim Barreiros"));
-                    var anaMalhoa = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Ana Malhoa"));
-                    var rancho = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains("Rancho"));
+                ("Grande Concerto de Abertura", "Ana Malhoa", TimeSpan.FromMinutes(15), 90),
+                ("Grande Arraial Popular", "Quim Barreiros", TimeSpan.FromHours(1), 120),
+                ("Tarde de Cantares e Tradição", "Rancho Folclórico", TimeSpan.FromMinutes(30), 90),
+                ("Festas do Concelho de Ferreira do Zêzere", "Toy", TimeSpan.FromHours(1.5), 90),
+                ("Festas em Honra de Nossa Senhora da Purificação", "Rosinha", TimeSpan.FromHours(1), 90),
+                ("Grandes Jantares de São Bartolomeu", "Augusto Canário & Amigos", TimeSpan.FromMinutes(30), 120),
+                ("Arraial de Verão da Pedreira", "Toy", TimeSpan.FromHours(1), 90),
+                ("Festas de Julho de Casais", "Quim Barreiros", TimeSpan.FromHours(1.5), 120),
+                ("Junceira com Tradições", "Rancho Folclórico", TimeSpan.FromMinutes(45), 90),
+                ("Noite de Baile de Valdonas", "Toy", TimeSpan.FromHours(1), 120),
+                ("Festas de Verão de Águas Belas", "Rosinha", TimeSpan.FromHours(1), 90),
+                ("Noite Recreativa do Alqueidão", "David Antunes & The Midnight Band", TimeSpan.FromHours(1), 120),
+                ("Festas de Santos Populares de Cabeças", "Quim Barreiros", TimeSpan.FromHours(1.5), 120),
+                ("Arraial Bairrista de Vialonga", "Augusto Canário & Amigos", TimeSpan.FromHours(1), 120),
+                ("Festa Tradicional de Barreiras", "Bandas Filarmónicas Reunidas", TimeSpan.FromMinutes(30), 180),
+                ("Tasquinhas de Fonte Dom João", "Rancho Folclórico", TimeSpan.FromMinutes(30), 120),
+                ("Festas do Divino Espírito Santo", "Bandas Filarmónicas Reunidas", TimeSpan.FromHours(1), 120),
+                ("Festa dos Emigrantes do Carqueijal", "Toy", TimeSpan.FromHours(1), 120),
+                ("Romaria Tradicional da Bairradinha", "Bandas Filarmónicas Reunidas", TimeSpan.FromHours(1), 120),
+                ("Romaria Anual de Asseiceira", "Bandas Filarmónicas Reunidas", TimeSpan.FromHours(2), 180),
+                ("Festas de Agosto de Paialvo", "David Antunes & The Midnight Band", TimeSpan.FromHours(1.5), 120),
+                ("Festejos de Santa Cita", "Ana Malhoa", TimeSpan.FromHours(1), 90),
+                
+                // Festival Bons Sons (multi-dia)
+                ("Festival Bons Sons", "Miguel Araújo", TimeSpan.FromHours(4), 90),
+                ("Festival Bons Sons", "Gisela João", TimeSpan.FromDays(1).Add(TimeSpan.FromHours(5)), 75),
+                ("Festival Bons Sons", "The Gift", TimeSpan.FromDays(2).Add(TimeSpan.FromHours(6.5)), 90),
+                ("Festival Bons Sons", "Bonga", TimeSpan.FromDays(3).Add(TimeSpan.FromHours(3.5)), 90),
+                ("Festival Bons Sons", "Kura", TimeSpan.FromDays(3).Add(TimeSpan.FromHours(7)), 120)
+            };
 
-                    if (quimBarreiros != null && anaMalhoa != null && rancho != null)
+            var cartazesParaInserir = new List<Cartaz>();
+
+            foreach (var spec in specs)
+            {
+                var evento = await context.Eventos.FirstOrDefaultAsync(e => e.Nome.Contains(spec.EventoQuery));
+                var artista = await context.Artistas.FirstOrDefaultAsync(a => a.Nome.Contains(spec.ArtistaQuery));
+
+                if (evento != null && artista != null)
+                {
+                    bool existeAtuacao = await context.Cartazes.AnyAsync(c => c.IdEvento == evento.IdEvento && c.IdArtista == artista.IdArtista);
+                    if (!existeAtuacao)
                     {
-                        var cartazes = new List<Cartaz>
+                        var dataAtuacao = evento.DataInicio.Add(spec.Offset);
+                        
+                        if (dataAtuacao >= evento.DataInicio && dataAtuacao < evento.DataFim)
                         {
-                            new Cartaz
+                            cartazesParaInserir.Add(new Cartaz
                             {
-                                IdEvento = concertoAbertura.IdEvento,
-                                IdArtista = anaMalhoa.IdArtista,
-                                DataHoraAtuacao = concertoAbertura.DataInicio.AddMinutes(15), // Começa 15 min após início do evento
-                                DuracaoMinutos = 90
-                            },
-                            new Cartaz
-                            {
-                                IdEvento = arraialPopular.IdEvento,
-                                IdArtista = quimBarreiros.IdArtista,
-                                DataHoraAtuacao = arraialPopular.DataInicio.AddHours(1), // Começa 1h após início do arraial
-                                DuracaoMinutos = 120
-                            },
-                            new Cartaz
-                            {
-                                IdEvento = tardeTradicao.IdEvento,
-                                IdArtista = rancho.IdArtista,
-                                DataHoraAtuacao = tardeTradicao.DataInicio.AddMinutes(30),
-                                DuracaoMinutos = 90
-                            }
-                        };
-                        await context.Cartazes.AddRangeAsync(cartazes);
-                        await context.SaveChangesAsync();
+                                IdEvento = evento.IdEvento,
+                                IdArtista = artista.IdArtista,
+                                DataHoraAtuacao = dataAtuacao,
+                                DuracaoMinutos = spec.Duracao
+                            });
+                        }
                     }
                 }
+            }
+
+            if (cartazesParaInserir.Any())
+            {
+                await context.Cartazes.AddRangeAsync(cartazesParaInserir);
+                await context.SaveChangesAsync();
             }
         }
     }
