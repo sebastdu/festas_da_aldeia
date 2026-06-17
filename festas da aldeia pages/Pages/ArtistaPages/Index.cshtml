@@ -5,128 +5,124 @@
     ViewData["Title"] = "Artistas";
 }
 
-<div class="page-header-container d-flex justify-content-between align-items-center flex-wrap gap-2">
-    <div>
-        <h1 class="page-title-gradient mb-1"><i class="bi bi-people me-2"></i>Artistas</h1>
-        <p class="text-muted mb-0" style="font-size:0.95rem;">Gerir os artistas do programa de atuações</p>
+<div class="page-header-container mb-3">
+    <h1 class="page-title-gradient mb-1"><i class="bi bi-people me-2"></i>Artistas</h1>
+    <p class="text-muted mb-0" style="font-size:0.95rem;">Conheça os artistas do programa de atuações</p>
+</div>
+
+@* ── PESQUISA ── *@
+<form method="get" class="mb-3">
+    <input type="hidden" name="Ordem" value="@Model.Ordem" />
+    <div class="cartaz-search-wrapper">
+        <i class="bi bi-search cartaz-search-icon"></i>
+        <input type="text" name="Pesquisa" value="@Model.Pesquisa"
+               class="cartaz-search-input"
+               placeholder="Pesquisar artista pelo nome…"
+               autocomplete="off" />
+        @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+        {
+            <a asp-page="./Index" asp-route-Ordem="@Model.Ordem" class="cartaz-search-clear" title="Limpar">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        }
+        <button type="submit" class="cartaz-search-btn">Pesquisar</button>
     </div>
-    @if (User.IsInRole("Admin"))
+    @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
     {
-        <a asp-page="Create" class="btn btn-primary">
-            <i class="bi bi-plus-lg"></i> Novo Artista
+        <p class="mt-2 mb-0 text-muted" style="font-size:0.85rem;">
+            <i class="bi bi-funnel me-1"></i>
+            @Model.Artista.Count resultado@(Model.Artista.Count != 1 ? "s" : "") para
+            "<strong>@Model.Pesquisa</strong>"
+        </p>
+    }
+</form>
+
+@* ── ORDENAÇÃO ── *@
+<div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
+    <span class="text-muted" style="font-size:0.85rem;font-weight:600;">Ordenar:</span>
+    @foreach (var (val, label, icon) in new[] {
+        ("az",    "A → Z",          "bi-sort-alpha-down"),
+        ("za",    "Z → A",          "bi-sort-alpha-up"),
+        ("mais",  "Mais atuações",  "bi-sort-numeric-down-alt"),
+        ("menos", "Menos atuações", "bi-sort-numeric-down"),
+    })
+    {
+        var ativo = (Model.Ordem ?? "az") == val;
+        <a asp-page="./Index" asp-route-Ordem="@val" asp-route-Pesquisa="@Model.Pesquisa"
+               class="artista-ordem-btn @(ativo ? "ativo" : "")">
+            <i class="bi @icon me-1"></i>@label
         </a>
     }
 </div>
 
+@* ── GRELHA ── *@
 @if (!Model.Artista.Any())
 {
     <div class="text-center py-5 text-muted">
         <i class="bi bi-people" style="font-size:3rem; opacity:0.3;"></i>
-        <p class="mt-3">Ainda não existem artistas registados.</p>
-        @if (User.IsInRole("Admin"))
-        {
-            <a asp-page="Create" class="btn btn-primary mt-2"><i class="bi bi-plus-lg"></i> Adicionar primeiro artista</a>
-        }
+        <p class="mt-3">
+            @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+            {
+                <text>Nenhum artista encontrado para "<strong>@Model.Pesquisa</strong>".</text>
+            }
+            else
+            {
+
+                <text>Ainda não existem artistas registados.</text>
+            }
+        </p>
     </div>
 }
 else
 {
-    <div class="table-custom-wrapper">
-        <table class="table table-custom table-hover mb-0">
-            <thead>
-                <tr>
-                    <th><i class="bi bi-person me-1"></i>Nome Artístico</th>
-                    <th><i class="bi bi-chat-text me-1"></i>Biografia</th>
-                    <th><i class="bi bi-telephone me-1"></i>Contacto</th>
-                    <th><i class="bi bi-image me-1"></i>Foto de Perfil</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Artista)
-                {
-                    <tr>
-                        <td>
-                            <div class="d-flex align-items-center gap-2">
-                                @if (!string.IsNullOrEmpty(item.LinkFotoPerfil))
-                                {
-                                    var avatarUrl = item.LinkFotoPerfil;
-                                    if (!avatarUrl.StartsWith("http://") && !avatarUrl.StartsWith("https://"))
-                                        avatarUrl = "https://" + avatarUrl;
-                                    <img src="@avatarUrl" alt="@item.Nome"
-                                         style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border-light);"
-                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
-                                    <span class="d-none align-items-center justify-content-center"
-                                          style="width:36px;height:36px;border-radius:50%;background:rgba(99,102,241,0.1);color:var(--primary-color);font-size:1rem;">
-                                        <i class="bi bi-person"></i>
-                                    </span>
-                                }
-                                else
-                                {
-                                    <span class="d-flex align-items-center justify-content-center"
-                                          style="width:36px;height:36px;border-radius:50%;background:rgba(99,102,241,0.1);color:var(--primary-color);font-size:1rem;">
-                                        <i class="bi bi-person"></i>
-                                    </span>
-                                }
-                                <span class="fw-semibold">@Html.DisplayFor(m => item.Nome)</span>
-                            </div>
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(item.Biografia))
-                            {
-                                <span title="@item.Biografia" style="cursor:default;">
-                                    @(item.Biografia.Length > 60 ? item.Biografia.Substring(0, 60) + "…" : item.Biografia)
-                                </span>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">—</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(item.Contacto))
-                            {
-                                <span><i class="bi bi-telephone-fill me-1 text-muted" style="font-size:0.8rem;"></i>@Html.DisplayFor(m => item.Contacto)</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">—</span>
-                            }
-                        </td>
-                        <td>
-                            @if (!string.IsNullOrEmpty(item.LinkFotoPerfil))
-                            {
-                                <a href="@item.LinkFotoPerfil" target="_blank" class="text-primary text-decoration-none" style="font-size:0.85rem;">
-                                    <i class="bi bi-link-45deg me-1"></i>Ver foto
-                                </a>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">—</span>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-1">
-                                <a asp-page="./Details" asp-route-id="@item.IdArtista"
-                                       class="btn-action-sm details" title="Detalhes">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-page="./Edit" asp-route-id="@item.IdArtista"
-                                           class="btn-action-sm" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a asp-page="./Delete" asp-route-id="@item.IdArtista"
-                                           class="btn-action-sm delete" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="artistas-grid">
+        @foreach (var item in Model.Artista)
+        {
+            var fotoUrl = item.LinkFotoPerfil;
+            if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+                fotoUrl = "https://" + fotoUrl;
+
+            var detailsUrl = Url.Page("./Details", new { id = item.IdArtista });
+
+            <div class="artista-banner">
+                <a href="@detailsUrl" class="artista-banner-link" aria-label="Ver @item.Nome"></a>
+
+                <div class="artista-banner-foto">
+                    @if (!string.IsNullOrEmpty(fotoUrl))
+                    {
+                        <img src="@fotoUrl" alt="@item.Nome"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                        <div class="artista-banner-foto-fallback" style="display:none;">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="artista-banner-foto-fallback">
+                            <i class="bi bi-person"></i>
+                        </div>
+                    }
+                </div>
+
+                <div class="artista-banner-body">
+                    <h5 class="artista-banner-nome">@item.Nome</h5>
+                    @if (item.Cartazes.Any())
+                    {
+                        <span class="artista-banner-atuacoes">
+                            <i class="bi bi-music-note-list me-1"></i>@item.Cartazes.Count atuaç@(item.Cartazes.Count == 1 ? "ão" : "ões")
+                        </span>
+                    }
+                </div>
+            </div>
+        }
     </div>
 }
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string> { ["Ordem"] = Model.Ordem ?? "", ["Pesquisa"] = Model.Pesquisa ?? "" };
+}
+<partial name="_Paginacao" />

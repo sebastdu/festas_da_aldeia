@@ -1,0 +1,386 @@
+@page "{id:int}"
+@model festas_da_aldeia_pages.Pages.EventoPages.ClienteModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = Model.Evento.Nome;
+    var ptPT = new CultureInfo("pt-PT");
+    var agora = DateTime.Now;
+    var emCurso = Model.Evento.DataInicio <= agora && Model.Evento.DataFim >= agora;
+    var passado = Model.Evento.DataFim < agora;
+    var futuro  = Model.Evento.DataInicio > agora;
+    var duraDias = (Model.Evento.DataFim.Date - Model.Evento.DataInicio.Date).Days + 1;
+
+    string[] grads = [
+        "linear-gradient(135deg,#4f46e5,#7c3aed)",
+        "linear-gradient(135deg,#0ea5e9,#2563eb)",
+        "linear-gradient(135deg,#f59e0b,#ef4444)",
+        "linear-gradient(135deg,#10b981,#059669)",
+        "linear-gradient(135deg,#ec4899,#8b5cf6)",
+        "linear-gradient(135deg,#14b8a6,#0ea5e9)",
+    ];
+    var grad = grads[Model.Evento.IdEvento % grads.Length];
+    var totalHoras = (Model.Evento.DataFim - Model.Evento.DataInicio).TotalHours;
+
+    // Mapa
+    var temMapa = false;
+    double lat = 0, lng = 0;
+    var local = Model.Evento.Local;
+    if (local != null && !string.IsNullOrEmpty(local.Coordenadas))
+    {
+        var partes = local.Coordenadas.Trim().Split(',');
+        if (partes.Length == 2 &&
+            double.TryParse(partes[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lat) &&
+            double.TryParse(partes[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
+        {
+            temMapa = true;
+        }
+    }
+
+    // Artistas únicos do evento
+    var artistas = Model.Evento.Cartazes
+        .Where(c => c.Artista != null)
+        .Select(c => c.Artista!)
+        .DistinctBy(a => a.IdArtista)
+        .OrderBy(a => a.Nome)
+        .ToList();
+}
+
+<div class="mb-3">
+    <a asp-page="./ClienteLista" class="back-link d-inline-flex align-items-center gap-1">
+        <i class="bi bi-arrow-left"></i> Voltar aos eventos
+    </a>
+</div>
+
+@* ── POSTER HERO ── *@
+<div class="evento-hero-banner mb-4" style="background: @grad;">
+    <div class="evento-hero-overlay">
+        <div>
+            @if (emCurso)
+            { <span class="badge-live mb-2 d-inline-flex"><i class="bi bi-circle-fill me-1"></i>Em curso</span> }
+            else if (passado)
+            { <span class="badge-past mb-2 d-inline-flex"><i class="bi bi-check-circle me-1"></i>Concluído</span> }
+            <h1 class="evento-hero-nome">@Model.Evento.Nome</h1>
+            <p class="evento-hero-datas">
+                <i class="bi bi-calendar-range me-2"></i>
+                @if (duraDias == 1)
+                { @Model.Evento.DataInicio.ToString("d 'de' MMMM 'de' yyyy", ptPT) }
+                else
+                { @($"{Model.Evento.DataInicio.ToString("d MMM", ptPT)} — {Model.Evento.DataFim.ToString("d MMM yyyy", ptPT)}") }
+            </p>
+        </div>
+        @if (futuro)
+        {
+            <div class="evento-hero-countdown" id="countdown-box">
+                <div class="countdown-grid">
+                    <div class="countdown-item"><span id="cd-dias">--</span><small>dias</small></div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item"><span id="cd-horas">--</span><small>h</small></div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item"><span id="cd-min">--</span><small>min</small></div>
+                    <div class="countdown-sep">:</div>
+                    <div class="countdown-item"><span id="cd-seg">--</span><small>seg</small></div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="row g-4">
+
+    @* ── COLUNA ESQUERDA ── *@
+    <div class="col-lg-4">
+
+        @* Info base *@
+        <div class="evento-cliente-info mb-4">
+
+            <div class="evento-cliente-info-item">
+                <i class="bi bi-clock text-primary"></i>
+                <div>
+                    <div class="evento-cliente-info-label">Duração total</div>
+                    <div class="evento-cliente-info-value">
+                        @(duraDias == 1 ? $"{totalHoras:F0} horas" : $"{duraDias} dias")
+                    </div>
+                </div>
+            </div>
+
+            @if (local != null)
+            {
+                <div class="evento-cliente-info-item">
+                    <i class="bi bi-geo-alt-fill text-danger"></i>
+                    <div>
+                        <div class="evento-cliente-info-label">Local</div>
+                        <div class="evento-cliente-info-value">
+                            @local.Nome
+                            @if (local.Outside)
+                            { <span class="badge-exterior ms-1"><i class="bi bi-sun me-1"></i>Ext.</span> }
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <div class="evento-cliente-info-item">
+                <i class="bi bi-calendar-range text-primary"></i>
+                <div>
+                    <div class="evento-cliente-info-label">Horário</div>
+                    <div class="evento-cliente-info-value">
+                        @Model.Evento.DataInicio.ToString("HH:mm") — @Model.Evento.DataFim.ToString("HH:mm")
+                    </div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.Evento.Patrocinador))
+            {
+                <div class="evento-cliente-info-item">
+                    <i class="bi bi-award-fill text-warning"></i>
+                    <div>
+                        <div class="evento-cliente-info-label">Patrocinador</div>
+                        <div class="evento-cliente-info-value">@Model.Evento.Patrocinador</div>
+                    </div>
+                </div>
+            }
+
+            <div class="evento-cliente-bio">
+                <div class="evento-cliente-info-label mb-1"><i class="bi bi-info-circle me-1"></i>Sobre o evento</div>
+                @if (!string.IsNullOrEmpty(Model.Evento.Descricao))
+                { <p class="mb-0" style="font-size:0.9rem;line-height:1.65;color:var(--text-muted);">@Model.Evento.Descricao</p> }
+                else
+                { <p class="mb-0" style="font-size:0.9rem;">&nbsp;</p> }
+            </div>
+        </div>
+
+        @* Artistas do evento *@
+        @if (artistas.Any())
+        {
+            <div class="mb-4">
+                <h5 class="fw-bold mb-3"><i class="bi bi-people me-2 text-primary"></i>Artistas</h5>
+                <div class="d-flex flex-column gap-2">
+                    @foreach (var artista in artistas)
+                    {
+                        var fotoA = artista.LinkFotoPerfil;
+                        if (!string.IsNullOrEmpty(fotoA) && !fotoA.StartsWith("http://") && !fotoA.StartsWith("https://"))
+                            fotoA = "https://" + fotoA;
+                        var iniciaisA = string.Concat(artista.Nome.Split(' ').Take(2).Select(p => p[0].ToString().ToUpper()));
+
+                        <a asp-page="/ArtistaPages/Details" asp-route-id="@artista.IdArtista"
+                           class="evento-artista-row text-decoration-none">
+                            <div class="evento-cartaz-avatar">
+                                @if (!string.IsNullOrEmpty(fotoA))
+                                {
+                                    <img src="@fotoA" alt="@artista.Nome"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                                    <div class="evento-cartaz-avatar-fallback" style="display:none;">@iniciaisA</div>
+                                }
+                                else
+                                { <div class="evento-cartaz-avatar-fallback">@iniciaisA</div> }
+                            </div>
+                            <span class="fw-semibold" style="font-size:0.9rem;color:var(--text-main);">@artista.Nome</span>
+                            <i class="bi bi-arrow-right ms-auto text-muted" style="font-size:0.8rem;"></i>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
+
+        @* Mapa *@
+        @if (temMapa)
+        {
+            <div>
+                <h5 class="fw-bold mb-3"><i class="bi bi-map me-2 text-primary"></i>Localização</h5>
+                <div id="mapa-evento" class="evento-mapa-wrapper"></div>
+            </div>
+        }
+    </div>
+
+    @* ── COLUNA DIREITA: DROPDOWN DATAS + PROGRAMA DO DIA ── *@
+    <div class="col-lg-8">
+        <h4 class="fw-bold mb-3">
+            <i class="bi bi-calendar-event me-2 text-primary"></i>Programa
+            @if (duraDias > 1)
+            { <span class="text-muted fw-normal" style="font-size:0.9rem;"> — @duraDias dias</span> }
+        </h4>
+
+        @if (!Model.DiasEvento.Any())
+        {
+            <div class="landing-empty">
+                <i class="bi bi-calendar-x"></i>
+                <p>Sem programa definido.</p>
+            </div>
+        }
+        else
+        {
+            @* Dropdown de seleção de dia *@
+            <div class="mb-3">
+                <select id="selectorDia" class="form-select form-control-custom" style="max-width:320px;">
+                    @for (int i = 0; i < Model.DiasEvento.Count; i++)
+                    {
+                        var dia = Model.DiasEvento[i];
+                        var isHoje = dia.Date == agora.Date;
+                        var isPrimeiro = i == 0 && futuro;
+                        <option value="dia-@i" selected="@((isHoje || isPrimeiro) ? "selected" : null)">
+                            @dia.ToString("dddd, d 'de' MMMM", ptPT)
+                            @(isHoje ? " — Hoje" : "")
+                        </option>
+                    }
+                </select>
+            </div>
+
+            @* Painéis por dia *@
+            @for (int i = 0; i < Model.DiasEvento.Count; i++)
+            {
+                var dia = Model.DiasEvento[i];
+                var isHoje = dia.Date == agora.Date;
+                var isPrimeiro = i == 0 && futuro;
+                var cartazesDoDia = Model.Evento.Cartazes
+                    .Where(c => c.DataHoraAtuacao.Date == dia.Date)
+                    .OrderBy(c => c.DataHoraAtuacao)
+                    .ToList();
+
+                <div id="dia-@i" class="dia-painel @((isHoje || isPrimeiro) ? "" : "d-none")">
+
+                    @* Cabeçalho do dia *@
+                    <div class="dia-painel-header mb-3">
+                        <div class="evento-accordion-cal me-3">
+                            <span class="cartaz-dia">@dia.ToString("ddd", ptPT).ToUpper()</span>
+                            <span class="cartaz-num">@dia.Day</span>
+                            <span class="cartaz-mes">@dia.ToString("MMM", ptPT).ToUpper()</span>
+                        </div>
+                        <div>
+                            <div class="fw-bold">@dia.ToString("d 'de' MMMM 'de' yyyy", ptPT)</div>
+                            <div class="text-muted" style="font-size:0.82rem;">
+                                <i class="bi bi-door-open me-1"></i>Abertura @Model.Evento.DataInicio.ToString("HH:mm")
+                                <span class="mx-2">·</span>
+                                <i class="bi bi-door-closed me-1"></i>Encerramento @Model.Evento.DataFim.ToString("HH:mm")
+                            </div>
+                        </div>
+                        @if (isHoje)
+                        { <span class="badge-live ms-auto"><i class="bi bi-circle-fill me-1"></i>Hoje</span> }
+                    </div>
+
+                    @* Programa do dia *@
+                    @if (!cartazesDoDia.Any())
+                    {
+                        <div class="text-center py-4 text-muted" style="background:var(--card-bg);border:1.5px dashed var(--border-light);border-radius:var(--radius-lg);">
+                            <i class="bi bi-calendar-minus" style="font-size:2rem;opacity:0.3;"></i>
+                            <p class="mt-2 mb-0" style="font-size:0.85rem;">Sem atuações programadas para este dia.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-2">
+                            @foreach (var cartaz in cartazesDoDia)
+                            {
+                                var fimC     = cartaz.DataHoraAtuacao.AddMinutes(cartaz.DuracaoMinutos);
+                                var emCursoC = cartaz.DataHoraAtuacao <= agora && fimC >= agora;
+                                var passadoC = fimC < agora;
+
+                                var fotoArtista = cartaz.Artista?.LinkFotoPerfil;
+                                if (!string.IsNullOrEmpty(fotoArtista) && !fotoArtista.StartsWith("http://") && !fotoArtista.StartsWith("https://"))
+                                    fotoArtista = "https://" + fotoArtista;
+
+                                var iniciaisC = cartaz.Artista?.Nome is { Length: > 0 } nn
+                                    ? string.Concat(nn.Split(' ').Take(2).Select(p => p[0].ToString().ToUpper()))
+                                    : "?";
+
+                                <div class="evento-cartaz-row @(emCursoC ? "evento-cartaz-live" : passadoC ? "evento-cartaz-past" : "")">
+                                    <div class="evento-cartaz-avatar">
+                                        @if (!string.IsNullOrEmpty(fotoArtista))
+                                        {
+                                            <img src="@fotoArtista" alt="@cartaz.Artista?.Nome"
+                                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                                            <div class="evento-cartaz-avatar-fallback" style="display:none;">@iniciaisC</div>
+                                        }
+                                        else
+                                        { <div class="evento-cartaz-avatar-fallback">@iniciaisC</div> }
+                                    </div>
+                                    <div class="flex-grow-1 min-width-0">
+                                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                                            <span class="fw-bold" style="font-size:0.95rem;">@cartaz.Artista?.Nome</span>
+                                            @if (emCursoC)
+                                            { <span class="badge-live"><i class="bi bi-circle-fill me-1"></i>Em curso</span> }
+                                            else if (passadoC)
+                                            { <span class="badge-past"><i class="bi bi-check-circle me-1"></i>Concluída</span> }
+                                        </div>
+                                        <div class="text-muted" style="font-size:0.8rem;">
+                                            <i class="bi bi-clock me-1"></i>
+                                            @cartaz.DataHoraAtuacao.ToString("HH:mm") — @fimC.ToString("HH:mm")
+                                            <span class="ms-2">(@cartaz.DuracaoMinutos min)</span>
+                                        </div>
+                                    </div>
+                                    <a asp-page="/ArtistaPages/Details" asp-route-id="@cartaz.IdArtista"
+                                       class="btn-action-sm details flex-shrink-0" title="Ver artista">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Dropdown de dias
+        document.getElementById('selectorDia')?.addEventListener('change', function () {
+            document.querySelectorAll('.dia-painel').forEach(p => p.classList.add('d-none'));
+            document.getElementById(this.value)?.classList.remove('d-none');
+        });
+    </script>
+
+    @if (futuro)
+    {
+        <script>
+            (function () {
+                var alvo = new Date("@Model.Evento.DataInicio.ToString("yyyy-MM-ddTHH:mm:ss")");
+                function atualizar() {
+                    var agora = new Date();
+                    var diff = alvo - agora;
+                    if (diff <= 0) {
+                        document.getElementById('countdown-box').innerHTML = '<span class="badge-live"><i class="bi bi-circle-fill me-1"></i>A começar agora!</span>';
+                        return;
+                    }
+                    var dias  = Math.floor(diff / 86400000);
+                    var horas = Math.floor((diff % 86400000) / 3600000);
+                    var min   = Math.floor((diff % 3600000) / 60000);
+                    var seg   = Math.floor((diff % 60000) / 1000);
+                    document.getElementById('cd-dias').textContent  = String(dias).padStart(2,'0');
+                    document.getElementById('cd-horas').textContent = String(horas).padStart(2,'0');
+                    document.getElementById('cd-min').textContent   = String(min).padStart(2,'0');
+                    document.getElementById('cd-seg').textContent   = String(seg).padStart(2,'0');
+                }
+                atualizar();
+                setInterval(atualizar, 1000);
+            })();
+        </script>
+    }
+
+    @if (temMapa)
+    {
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            (function () {
+                var map = L.map('mapa-evento').setView([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], 15);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                    maxZoom: 19
+                }).addTo(map);
+                var icon = L.divIcon({
+                    className: '',
+                    html: '<div class="mapa-marker"><i class="bi bi-calendar-event"></i></div>',
+                    iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -42]
+                });
+                L.marker([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], { icon: icon })
+                    .addTo(map)
+                    .bindPopup(
+                        '<div class="mapa-popup"><strong>@Html.Raw(Model.Evento.Nome)</strong>' +
+                        '<br><span style="font-size:0.82rem;color:#64748b;"><i class="bi bi-geo-alt me-1"></i>@Html.Raw(local!.Nome)</span>' +
+                        '<br><a href="https://www.google.com/maps?q=@lat.ToString(CultureInfo.InvariantCulture),@lng.ToString(CultureInfo.InvariantCulture)" target="_blank" class="mapa-popup-dir"><i class="bi bi-signpost-2 me-1"></i>Obter direções</a></div>'
+                    ).openPopup();
+            })();
+        </script>
+    }
+}

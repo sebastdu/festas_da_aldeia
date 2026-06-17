@@ -1,19 +1,61 @@
 @page
 @model festas_da_aldeia_pages.Pages.CartazPages.DetailsModel
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Detalhes da Atuação";
+    var ptPT = new CultureInfo("pt-PT");
+    var fimAtuacao = Model.Cartaz.DataHoraAtuacao.AddMinutes(Model.Cartaz.DuracaoMinutos);
+    var agora = DateTime.Now;
+    var emCurso = Model.Cartaz.DataHoraAtuacao <= agora && fimAtuacao >= agora;
+
+    // Foto artista
+    var fotoUrl = Model.Cartaz.Artista?.LinkFotoPerfil;
+    if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+        fotoUrl = "https://" + fotoUrl;
+
+    // Coordenadas do local
+    var temMapa = false;
+    double lat = 0, lng = 0;
+    var local = Model.Cartaz.Evento?.Local;
+    if (local != null && !string.IsNullOrEmpty(local.Coordenadas))
+    {
+        var partes = local.Coordenadas.Trim().Split(',');
+        if (partes.Length == 2 &&
+            double.TryParse(partes[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lat) &&
+            double.TryParse(partes[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
+        {
+            temMapa = true;
+        }
+    }
 }
 
-<div class="page-header-container">
-    <a asp-page="./Index" class="back-link mb-3 d-inline-flex">
-        <i class="bi bi-arrow-left"></i> Voltar à lista
+<div class="mb-3">
+    <a asp-page="./Index" class="back-link d-inline-flex">
+        <i class="bi bi-arrow-left"></i> Voltar aos cartazes
     </a>
-    <h1 class="page-title-gradient mb-1"><i class="bi bi-file-music me-2"></i>Detalhes da Atuação</h1>
 </div>
 
-<div class="row">
-    <div class="col-lg-7 col-md-9">
+<div class="row g-4">
+
+    @* ── COLUNA ESQUERDA: DETALHES ── *@
+    <div class="col-lg-5">
+
+        @* Foto do artista *@
+        @if (!string.IsNullOrEmpty(fotoUrl))
+        {
+            <div class="cartaz-details-foto mb-4">
+                <img src="@fotoUrl" alt="@Model.Cartaz.Artista?.Nome"
+                     onerror="this.parentElement.style.display='none';" />
+                @if (emCurso)
+                {
+                    <div class="cartaz-details-foto-badge">
+                        <span class="badge-live"><i class="bi bi-circle-fill me-1"></i>Em curso</span>
+                    </div>
+                }
+            </div>
+        }
+
         <div class="info-sheet">
 
             <div class="info-item">
@@ -22,46 +64,64 @@
                     @if (Model.Cartaz.Artista != null)
                     {
                         <a asp-page="/ArtistaPages/Details" asp-route-id="@Model.Cartaz.Artista.IdArtista"
-                               class="text-decoration-none fw-semibold">
+                               class="fw-semibold text-decoration-none">
                             @Model.Cartaz.Artista.Nome
                         </a>
                     }
                     else
                     {
+
                         <span class="text-muted fst-italic">—</span>
                     }
                 </div>
             </div>
 
             <div class="info-item">
-                <div class="info-label"><i class="bi bi-calendar2 me-1"></i>Evento</div>
+                <div class="info-label"><i class="bi bi-calendar-event me-1"></i>Evento</div>
                 <div class="info-value">
                     @if (Model.Cartaz.Evento != null)
                     {
-                        <span class="fw-semibold">@Model.Cartaz.Evento.Nome</span>
+                        <a asp-page="/EventoPages/Details" asp-route-id="@Model.Cartaz.Evento.IdEvento"
+                               class="fw-semibold text-decoration-none">
+                            @Model.Cartaz.Evento.Nome
+                        </a>
                     }
                     else
                     {
+
                         <span class="text-muted fst-italic">—</span>
                     }
                 </div>
             </div>
 
             <div class="info-item">
-                <div class="info-label"><i class="bi bi-calendar-event me-1"></i>@Html.DisplayNameFor(m => m.Cartaz.DataHoraAtuacao)</div>
+                <div class="info-label"><i class="bi bi-calendar3 me-1"></i>Data</div>
                 <div class="info-value">
-                    @Model.Cartaz.DataHoraAtuacao.ToString("dd 'de' MMMM 'de' yyyy 'às' HH:mm", new System.Globalization.CultureInfo("pt-PT"))
+                    @Model.Cartaz.DataHoraAtuacao.ToString("d 'de' MMMM 'de' yyyy", ptPT)
                 </div>
             </div>
 
             <div class="info-item">
-                <div class="info-label"><i class="bi bi-clock me-1"></i>@Html.DisplayNameFor(m => m.Cartaz.DuracaoMinutos)</div>
+                <div class="info-label"><i class="bi bi-clock me-1"></i>Horário</div>
                 <div class="info-value">
-                    <span class="badge-custom badge-duration">
-                        <i class="bi bi-clock"></i> @Model.Cartaz.DuracaoMinutos minutos
-                    </span>
+                    @Model.Cartaz.DataHoraAtuacao.ToString("HH:mm") — @fimAtuacao.ToString("HH:mm")
+                    <span class="text-muted ms-2" style="font-size:0.85rem;">(@Model.Cartaz.DuracaoMinutos min)</span>
                 </div>
             </div>
+
+            @if (local != null)
+            {
+                <div class="info-item">
+                    <div class="info-label"><i class="bi bi-geo-alt me-1"></i>Local</div>
+                    <div class="info-value">
+                        @local.Nome
+                        @if (local.Outside)
+                        {
+                            <span class="badge-exterior ms-2"><i class="bi bi-sun me-1"></i>Exterior</span>
+                        }
+                    </div>
+                </div>
+            }
 
         </div>
 
@@ -77,4 +137,64 @@
             </div>
         }
     </div>
+
+    @* ── COLUNA DIREITA: MAPA ── *@
+    <div class="col-lg-7">
+        @if (temMapa)
+        {
+            <h5 class="fw-bold mb-3"><i class="bi bi-map me-2 text-primary"></i>Localização — @local!.Nome</h5>
+            <div id="mapa-cartaz" class="evento-mapa-wrapper"></div>
+        }
+        else
+        {
+            <div class="landing-empty h-100 d-flex flex-column align-items-center justify-content-center" style="min-height:300px;">
+                <i class="bi bi-map" style="font-size:2.5rem;opacity:0.25;"></i>
+                <p class="mt-2 mb-0">Sem coordenadas para este local.</p>
+                @if (local != null)
+                {
+                    <small class="text-muted mt-1">Edita o local "@local.Nome" e adiciona as coordenadas.</small>
+                }
+            </div>
+        }
+    </div>
+
 </div>
+
+@if (temMapa)
+{
+    @section Scripts {
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            (function () {
+            var map = L.map('mapa-cartaz').setView([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], 15);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+            }).addTo(map);
+
+            var icon = L.divIcon({
+            className: '',
+            html: '<div class="mapa-marker"><i class="bi bi-music-note-beamed"></i></div>',
+            iconSize: [40, 40],
+            iconAnchor: [20, 40],
+            popupAnchor: [0, -42]
+            });
+
+            L.marker([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], { icon: icon })
+            .addTo(map)
+            .bindPopup(
+            '<div class="mapa-popup">' +
+            '<strong>@Html.Raw(Model.Cartaz.Artista?.Nome ?? "")</strong>' +
+            '<br><span style="font-size:0.85rem;color:#64748b;">@Html.Raw(Model.Cartaz.Evento?.Nome ?? "")</span>' +
+            '<br><span style="font-size:0.82rem;color:#64748b;"><i class="bi bi-geo-alt me-1"></i>@Html.Raw(local!.Nome)</span>' +
+            '<br><a href="https://www.google.com/maps?q=@lat.ToString(CultureInfo.InvariantCulture),@lng.ToString(CultureInfo.InvariantCulture)" target="_blank" class="mapa-popup-dir">' +
+            '<i class="bi bi-signpost-2 me-1"></i>Obter direções</a>' +
+            '</div>'
+            )
+            .openPopup();
+            })();
+        </script>
+    }
+}

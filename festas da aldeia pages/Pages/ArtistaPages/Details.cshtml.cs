@@ -9,6 +9,7 @@ namespace festas_da_aldeia_pages.Pages.ArtistaPages;
 public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _context;
+
     public DetailsModel(ApplicationDbContext context)
     {
         _context = context;
@@ -18,21 +19,17 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int? id)
     {
-        if (id is null)
-        {
-            return NotFound();
-        }
+        if (id is null) return NotFound();
 
-        var artista = await _context.Artistas.FirstOrDefaultAsync(m => m.IdArtista == id);
-        if (artista is null)
-        {
-            return NotFound();
-        }
-        else
-        {
-            Artista = artista;
-        }
+        var artista = await _context.Artistas
+            .Include(a => a.Cartazes)
+                .ThenInclude(c => c.Evento)
+                    .ThenInclude(e => e.Local)
+            .FirstOrDefaultAsync(m => m.IdArtista == id);
 
+        if (artista is null) return NotFound();
+
+        Artista = artista;
         return Page();
     }
 }

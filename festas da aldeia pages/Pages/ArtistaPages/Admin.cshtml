@@ -1,0 +1,141 @@
+@page
+@model festas_da_aldeia_pages.Pages.ArtistaPages.AdminModel
+
+@{
+    ViewData["Title"] = "Gestão de Artistas";
+}
+
+<div class="page-header-container d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+    <div>
+        <h1 class="page-title-gradient mb-1"><i class="bi bi-people-fill me-2"></i>Gestão de Artistas</h1>
+        <p class="text-muted mb-0" style="font-size:0.95rem;">
+            @Model.TotalItens artista@(Model.TotalItens != 1 ? "s" : "") registado@(Model.TotalItens != 1 ? "s" : "")
+        </p>
+    </div>
+    <a asp-page="./Create" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> Adicionar Artista
+    </a>
+</div>
+
+@if (!Model.Artistas.Any())
+{
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-people" style="font-size:3rem; opacity:0.3;"></i>
+        <p class="mt-3">Ainda não existem artistas registados.</p>
+        <a asp-page="./Create" class="btn btn-primary mt-2">
+            <i class="bi bi-plus-lg"></i> Adicionar primeiro artista
+        </a>
+    </div>
+}
+else
+{
+    <div class="table-custom-wrapper">
+        <table class="table table-custom table-hover mb-0 align-middle">
+            <thead>
+                <tr>
+                    <th style="width:52px;"></th>
+                    <th><i class="bi bi-person me-1"></i>Nome</th>
+                    <th><i class="bi bi-telephone me-1"></i>Contacto</th>
+                    <th><i class="bi bi-chat-text me-1"></i>Biografia</th>
+                    <th class="text-center"><i class="bi bi-music-note-list me-1"></i>Atuações</th>
+                    <th class="text-center" style="width:110px;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var artista in Model.Artistas)
+                {
+                    var fotoUrl = artista.LinkFotoPerfil;
+                    if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+                        fotoUrl = "https://" + fotoUrl;
+
+                    <tr>
+                        <td>
+                            @if (!string.IsNullOrEmpty(fotoUrl))
+                            {
+                                <img src="@fotoUrl" alt="@artista.Nome" class="admin-artista-avatar"
+                                     onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                                <div class="admin-artista-avatar-fallback" style="display:none;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="admin-artista-avatar-fallback">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                            }
+                        </td>
+
+                        <td class="fw-semibold">@artista.Nome</td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(artista.Contacto))
+                            {
+                                <span class="d-flex align-items-center gap-1">
+                                    <i class="bi bi-telephone-fill text-muted" style="font-size:0.78rem;"></i>
+                                    @artista.Contacto
+                                </span>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+
+                        <td>
+                            @if (!string.IsNullOrEmpty(artista.Biografia))
+                            {
+                                <span title="@artista.Biografia" style="cursor:default;">
+                                    @(artista.Biografia.Length > 55 ? artista.Biografia.Substring(0, 55) + "…" : artista.Biografia)
+                                </span>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+
+                        <td class="text-center">
+                            @if (artista.Cartazes.Any())
+                            {
+                                <span class="artista-banner-atuacoes">
+                                    <i class="bi bi-music-note-list me-1"></i>@artista.Cartazes.Count
+                                </span>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted fst-italic">—</span>
+                            }
+                        </td>
+
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-1">
+                                <a asp-page="./Details" asp-route-id="@artista.IdArtista" class="btn-action-sm details" title="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a asp-page="./Edit" asp-route-id="@artista.IdArtista" class="btn-action-sm" title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <a asp-page="./Delete" asp-route-id="@artista.IdArtista" class="btn-action-sm delete" title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string>();
+}
+<partial name="_Paginacao" />

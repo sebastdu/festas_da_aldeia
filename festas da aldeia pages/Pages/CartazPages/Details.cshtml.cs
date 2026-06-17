@@ -9,6 +9,7 @@ namespace festas_da_aldeia_pages.Pages.CartazPages;
 public class DetailsModel : PageModel
 {
     private readonly ApplicationDbContext _context;
+
     public DetailsModel(ApplicationDbContext context)
     {
         _context = context;
@@ -18,21 +19,17 @@ public class DetailsModel : PageModel
 
     public async Task<IActionResult> OnGetAsync(int? id)
     {
-        if (id is null)
-        {
-            return NotFound();
-        }
+        if (id is null) return NotFound();
 
-        var cartaz = await _context.Cartazes.FirstOrDefaultAsync(m => m.IdCartaz == id);
-        if (cartaz is null)
-        {
-            return NotFound();
-        }
-        else
-        {
-            Cartaz = cartaz;
-        }
+        var cartaz = await _context.Cartazes
+            .Include(c => c.Artista)
+            .Include(c => c.Evento)
+                .ThenInclude(e => e.Local)
+            .FirstOrDefaultAsync(m => m.IdCartaz == id);
 
+        if (cartaz is null) return NotFound();
+
+        Cartaz = cartaz;
         return Page();
     }
 }

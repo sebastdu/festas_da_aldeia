@@ -31,31 +31,61 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 nav-links-custom ms-lg-4">
+
+                        @* ── INÍCIO ── *@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-page="/Index">
                                 <i class="bi bi-house-door me-1"></i> Início
                             </a>
                         </li>
+
+                        @* ── ARTISTAS ── *@
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/ArtistaPages/index">
+                            <a class="nav-link" asp-area="" asp-page="/ArtistaPages/Index">
                                 <i class="bi bi-people me-1"></i> Artistas
                             </a>
                         </li>
+
+                        @* ── EVENTOS ── *@
                         <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/cartazPages/index">
-                                <i class="bi bi-file-music me-1"></i> Cartazes
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/EventoPages/index">
+                            <a class="nav-link" asp-area="" asp-page="/EventoPages/ClienteLista">
                                 <i class="bi bi-calendar-event me-1"></i> Eventos
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-page="/LocalPages/index">
-                                <i class="bi bi-geo-alt me-1"></i> Locais
-                            </a>
-                        </li>
+
+                        @* ── GESTÃO (apenas Admin) — dropdown ── *@
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" role="button"
+                                       data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-shield-lock me-1"></i> Gestão
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-dark navbar-dropdown-custom">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="/ArtistaPages/Admin">
+                                            <i class="bi bi-people me-2"></i>Artistas
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="/CartazPages/Index">
+                                            <i class="bi bi-file-music me-2"></i>Cartazes
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="/EventoPages/Index">
+                                            <i class="bi bi-calendar-event me-2"></i>Eventos
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-page="/LocalPages/Index">
+                                            <i class="bi bi-geo-alt me-2"></i>Locais
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+
                     </ul>
                     <div class="d-flex align-items-center">
                         <partial name="_LoginPartial" />

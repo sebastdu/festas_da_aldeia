@@ -1,14 +1,18 @@
 @page
 @model festas_da_aldeia_pages.Pages.CartazPages.IndexModel
+@using System.Globalization
 
 @{
     ViewData["Title"] = "Cartazes";
+    var ptPT = new CultureInfo("pt-PT");
+    var agora = DateTime.Now;
 }
 
-<div class="page-header-container d-flex justify-content-between align-items-center flex-wrap gap-2">
+@* ── CABEÇALHO ── *@
+<div class="page-header-container d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
     <div>
         <h1 class="page-title-gradient mb-1"><i class="bi bi-file-music me-2"></i>Cartazes</h1>
-        <p class="text-muted mb-0" style="font-size:0.95rem;">Programa de atuações por evento</p>
+        <p class="text-muted mb-0" style="font-size:0.95rem;">Programa de atuações — estilo festival</p>
     </div>
     @if (User.IsInRole("Admin"))
     {
@@ -18,85 +22,155 @@
     }
 </div>
 
+@* ── PESQUISA ── *@
+<form method="get" class="mb-4">
+    <div class="cartaz-search-wrapper">
+        <i class="bi bi-search cartaz-search-icon"></i>
+        <input type="text" name="Pesquisa" value="@Model.Pesquisa"
+               class="cartaz-search-input"
+               placeholder="Pesquisar por artista, evento, local…"
+               autocomplete="off" />
+        @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+        {
+            <a asp-page="./Index" class="cartaz-search-clear" title="Limpar">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        }
+        <button type="submit" class="cartaz-search-btn">Pesquisar</button>
+    </div>
+    @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+    {
+        <p class="mt-2 mb-0 text-muted" style="font-size:0.85rem;">
+            <i class="bi bi-funnel me-1"></i>
+            @Model.Cartaz.Count resultado@(Model.Cartaz.Count != 1 ? "s" : "") para
+            "<strong>@Model.Pesquisa</strong>"
+        </p>
+    }
+</form>
+
+@* ── GRELHA DE CARTAZES ── *@
 @if (!Model.Cartaz.Any())
 {
     <div class="text-center py-5 text-muted">
         <i class="bi bi-file-music" style="font-size:3rem; opacity:0.3;"></i>
-        <p class="mt-3">Ainda não existem atuações registadas.</p>
+        <p class="mt-3">
+            @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+            {
+                <text>Nenhuma atuação encontrada para "<strong>@Model.Pesquisa</strong>".</text>
+            }
+            else
+            {
+
+                <text>Ainda não existem atuações registadas.</text>
+            }
+        </p>
         @if (User.IsInRole("Admin"))
         {
-            <a asp-page="Create" class="btn btn-primary mt-2"><i class="bi bi-plus-lg"></i> Adicionar primeira atuação</a>
+            <a asp-page="Create" class="btn btn-primary mt-2">
+                <i class="bi bi-plus-lg"></i> Adicionar primeira atuação
+            </a>
         }
     </div>
 }
 else
 {
-    <div class="table-custom-wrapper">
-        <table class="table table-custom table-hover mb-0">
-            <thead>
-                <tr>
-                    <th><i class="bi bi-calendar-event me-1"></i>Data e Hora</th>
-                    <th><i class="bi bi-clock me-1"></i>Duração</th>
-                    <th><i class="bi bi-person me-1"></i>Artista</th>
-                    <th><i class="bi bi-calendar2 me-1"></i>Evento</th>
-                    <th class="text-center">Ações</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model.Cartaz)
+    <div class="festival-grid">
+        @foreach (var item in Model.Cartaz)
+        {
+            var fimAtuacao = item.DataHoraAtuacao.AddMinutes(item.DuracaoMinutos);
+            var emCurso = item.DataHoraAtuacao <= agora && fimAtuacao >= agora;
+            var passado = fimAtuacao < agora;
+            var detailsUrl = Url.Page("./Details", new { id = item.IdCartaz });
+
+            var fotoUrl = item.Artista?.LinkFotoPerfil;
+            if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+                fotoUrl = "https://" + fotoUrl;
+
+            var iniciais = item.Artista?.Nome is { Length: > 0 } n
+                ? string.Concat(n.Split(' ').Take(2).Select(p => p[0].ToString().ToUpper()))
+                : "?";
+
+            <div class="festival-card @(emCurso ? "festival-card-live" : passado ? "festival-card-past" : "")">
+
+                <a href="@detailsUrl" class="festival-card-link" aria-label="Ver atuação"></a>
+
+                <div class="festival-card-foto">
+                    @if (!string.IsNullOrEmpty(fotoUrl))
+                    {
+                        <img src="@fotoUrl" alt="@item.Artista?.Nome"
+                             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+                        <div class="festival-card-iniciais" style="display:none;">@iniciais</div>
+                    }
+                    else
+                    {
+
+                        <div class="festival-card-iniciais">@iniciais</div>
+                    }
+
+                    @if (emCurso)
+                    {
+                        <div class="festival-card-badge-foto"><span class="badge-live"><i class="bi bi-circle-fill me-1"></i>Em curso</span></div>
+                    }
+                    else if (passado)
+                    {
+
+                        <div class="festival-card-badge-foto"><span class="badge-past"><i class="bi bi-check-circle me-1"></i>Concluída</span></div>
+                    }
+                </div>
+
+                <div class="festival-card-body">
+                    <div class="festival-card-artista">@(item.Artista?.Nome ?? "—")</div>
+
+                    @if (item.Evento != null)
+                    {
+                        <div class="festival-card-evento"><i class="bi bi-calendar-event me-1"></i>@item.Evento.Nome</div>
+                    }
+
+                    <div class="festival-card-detalhes">
+                        <span class="festival-card-detalhe"><i class="bi bi-calendar3"></i>@item.DataHoraAtuacao.ToString("d MMM", ptPT)</span>
+                        <span class="festival-card-sep">·</span>
+                        <span class="festival-card-detalhe"><i class="bi bi-clock"></i>@item.DataHoraAtuacao.ToString("HH:mm") — @fimAtuacao.ToString("HH:mm")</span>
+                        <span class="festival-card-sep">·</span>
+                        <span class="festival-card-detalhe"><i class="bi bi-hourglass-split"></i>@item.DuracaoMinutos min</span>
+                    </div>
+
+                    @if (item.Evento?.Local != null)
+                    {
+                        <div class="festival-card-local">
+                            <i class="bi bi-geo-alt-fill text-danger me-1"></i>@item.Evento.Local.Nome
+                            @if (item.Evento.Local.Outside)
+                            {
+                                <span class="badge-exterior ms-1"><i class="bi bi-sun me-1"></i>Ext.</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (User.IsInRole("Admin"))
                 {
-                    <tr>
-                        <td>
-                            <span class="fw-semibold">@item.DataHoraAtuacao.ToString("dd/MM/yyyy")</span>
-                            <span class="text-muted ms-2" style="font-size:0.9rem;">@item.DataHoraAtuacao.ToString("HH:mm")</span>
-                        </td>
-                        <td>
-                            <span class="badge-custom badge-duration">
-                                <i class="bi bi-clock"></i> @item.DuracaoMinutos min
-                            </span>
-                        </td>
-                        <td>
-                            @if (item.Artista != null)
-                            {
-                                <span class="fw-semibold">@item.Artista.Nome</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">—</span>
-                            }
-                        </td>
-                        <td>
-                            @if (item.Evento != null)
-                            {
-                                <span>@item.Evento.Nome</span>
-                            }
-                            else
-                            {
-                                <span class="text-muted fst-italic">—</span>
-                            }
-                        </td>
-                        <td class="text-center">
-                            <div class="d-flex justify-content-center gap-1">
-                                <a asp-page="./Details" asp-route-id="@item.IdCartaz"
-                                       class="btn-action-sm details" title="Detalhes">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <a asp-page="./Edit" asp-route-id="@item.IdCartaz"
-                                           class="btn-action-sm" title="Editar">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a asp-page="./Delete" asp-route-id="@item.IdCartaz"
-                                           class="btn-action-sm delete" title="Eliminar">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                }
-                            </div>
-                        </td>
-                    </tr>
+                    <div class="festival-card-admin">
+                        <a asp-page="./Edit" asp-route-id="@item.IdCartaz"
+                               class="btn-artista-action" title="Editar"
+                               onclick="event.stopPropagation();">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a asp-page="./Delete" asp-route-id="@item.IdCartaz"
+                               class="btn-artista-action delete" title="Eliminar"
+                               onclick="event.stopPropagation();">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </div>
                 }
-            </tbody>
-        </table>
+            </div>
+        }
     </div>
 }
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string> { ["Pesquisa"] = Model.Pesquisa ?? "" };
+}
+<partial name="_Paginacao" />
