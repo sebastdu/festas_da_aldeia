@@ -83,10 +83,50 @@
                 </h2>
                 <p class="text-muted mb-0 small">Encontra os recintos e vê onde estão a decorrer as festividades da aldeia.</p>
             </div>
-            <div>
-                <button id="btn-geolocation" class="btn btn-primary shadow-sm">
-                    <i class="bi bi-geo-alt-fill"></i> Obter Minha Localização
+        </div>
+
+        <!-- Control Panel for Filters -->
+        <div class="row g-3 mb-4 align-items-end map-controls-panel p-3 rounded-3 mx-0">
+            <!-- Geolocalização -->
+            <div class="col-lg-3 col-md-4">
+                <label class="form-label-custom mb-2 small text-muted">
+                    <i class="bi bi-compass me-1"></i>Posicionamento
+                </label>
+                <button id="btn-geolocation" class="btn btn-primary shadow-sm w-100 py-2">
+                    <i class="bi bi-geo-alt-fill"></i> Obter Localização
                 </button>
+            </div>
+            
+            <!-- Slider de Raio de Distância -->
+            <div class="col-lg-4 col-md-8" id="radius-control-container" style="opacity: 0.5; pointer-events: none; transition: opacity var(--transition-normal);">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <label for="radius-slider" class="form-label-custom mb-0 small text-muted">
+                        <i class="bi bi-broadcast text-primary me-1"></i>Raio de Proximidade
+                    </label>
+                    <span id="radius-badge" class="badge-custom badge-duration py-1 px-2 m-0">15 km</span>
+                </div>
+                <input type="range" class="form-range custom-slider" id="radius-slider" min="1" max="50" value="15" disabled>
+            </div>
+            
+            <!-- Filtro de Estado do Evento -->
+            <div class="col-lg-5 col-md-12">
+                <div class="d-flex flex-column">
+                    <label class="form-label-custom mb-2 small text-muted">
+                        <i class="bi bi-funnel-fill text-secondary me-1"></i>Estado das Festas
+                    </label>
+                    <div class="btn-group w-100" role="group" aria-label="Filtro de tempo">
+                        <input type="radio" class="btn-check" name="filter-time" id="btnradio-all" autocomplete="off" checked value="todos">
+                        <label class="btn btn-outline-primary btn-sm py-2" for="btnradio-all">Todas</label>
+
+                        <input type="radio" class="btn-check" name="filter-time" id="btnradio-now" autocomplete="off" value="decorrer">
+                        <label class="btn btn-outline-success btn-sm py-2" for="btnradio-now">
+                            <span class="d-inline-block rounded-circle bg-success me-1 animate-pulse" style="width: 8px; height: 8px;"></span>A Decorrer
+                        </label>
+
+                        <input type="radio" class="btn-check" name="filter-time" id="btnradio-soon" autocomplete="off" value="brevemente">
+                        <label class="btn btn-outline-primary btn-sm py-2" for="btnradio-soon">Brevemente</label>
+                    </div>
+                </div>
             </div>
         </div>
         
@@ -112,14 +152,14 @@
                 <h2 class="fw-extrabold text-dark mb-1"><i class="bi bi-calendar-event me-2 text-primary"></i>Hoje e Brevemente</h2>
                 <p class="text-muted mb-0 small">Os próximos espetáculos imperdíveis na aldeia.</p>
             </div>
-            <a asp-page="/EventoPages/index" class="text-decoration-none fw-bold small back-link">
+            <a asp-page="/EventoPages/ClienteLista" class="text-decoration-none fw-bold small back-link">
                 Ver Todos <i class="bi bi-arrow-right"></i>
             </a>
         </div>
         
         @if (!Model.EventosProximos.Any())
         {
-            <div class="card-custom text-center py-5 border-dashed">
+            <div class="card-custom text-center py-5 border-dashed" id="events-no-db-empty-state">
                 <div class="card-body-custom">
                     <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
                     <h5 class="fw-bold">Sem eventos futuros agendados</h5>
@@ -129,10 +169,25 @@
         }
         else
         {
-            <div class="d-flex flex-column gap-4">
+            <div class="d-flex flex-column gap-4" id="events-list-container">
                 @foreach (var ev in Model.EventosProximos)
                 {
-                    <div class="card card-custom border-light-subtle shadow-sm transition-all hover-translate-y">
+                    string lat = "";
+                    string lng = "";
+                    if (ev.Local != null && !string.IsNullOrEmpty(ev.Local.Coordenadas))
+                    {
+                        var coords = ev.Local.Coordenadas.Split(',');
+                        if (coords.Length == 2)
+                        {
+                            lat = coords[0].Trim();
+                            lng = coords[1].Trim();
+                        }
+                    }
+                    <div class="card card-custom border-light-subtle shadow-sm transition-all hover-translate-y event-card"
+                         data-lat="@lat"
+                         data-lng="@lng"
+                         data-inicio="@ev.DataInicio.ToString("yyyy-MM-ddTHH:mm:ss")"
+                         data-fim="@ev.DataFim.ToString("yyyy-MM-ddTHH:mm:ss")">
                         <div class="card-body-custom p-4">
                             <div class="d-flex justify-content-between align-items-start gap-2 mb-3">
                                 <div>
@@ -172,6 +227,15 @@
                         </div>
                     </div>
                 }
+
+                <!-- Empty state shown via JS if filters result in 0 visible cards -->
+                <div class="card-custom text-center py-5 border-dashed d-none" id="events-filter-empty-state">
+                    <div class="card-body-custom">
+                        <i class="bi bi-funnel fs-1 text-muted mb-3 d-block"></i>
+                        <h5 class="fw-bold">Nenhum evento corresponde aos filtros</h5>
+                        <p class="text-muted small">Tente aumentar o raio de pesquisa ou alterar o filtro de tempo.</p>
+                    </div>
+                </div>
             </div>
         }
     </div>
@@ -233,10 +297,7 @@
                 }
             </div>
         }
-    </div>
-</div>
-
-<style>
+    <style>
 /* Micro-animation for floating logo in hero banner */
 .floating-logo {
     animation: float 4s ease-in-out infinite;
@@ -285,6 +346,86 @@
     width: 1rem;
     height: 1rem;
     border-width: 0.15em;
+}
+
+/* Premium styling for filters */
+.map-controls-panel {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid var(--border-light);
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-normal);
+}
+
+.custom-slider {
+    height: 6px;
+    background-color: var(--border-light);
+    border-radius: var(--radius-full);
+    outline: none;
+}
+
+.custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.custom-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: #4f46e5;
+}
+
+.custom-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: none;
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+    transition: transform var(--transition-fast), background-color var(--transition-fast);
+}
+
+.custom-slider::-moz-range-thumb:hover {
+    transform: scale(1.2);
+    background: #4f46e5;
+}
+
+.animate-pulse {
+    animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: .4;
+        transform: scale(1.1);
+    }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
 
@@ -364,7 +505,7 @@
             });
             
             // Adicionar marcadores dos eventos
-            const eventMarkers = [];
+            const markerObjects = [];
             validEvents.forEach(e => {
                 const popupContent = `
                     <div style="min-width: 180px;">
@@ -391,23 +532,34 @@
                     .bindPopup(popupContent)
                     .addTo(map);
                     
-                eventMarkers.push(marker);
+                markerObjects.push({
+                    marker: marker,
+                    data: e
+                });
             });
             
             // Se houver múltiplos eventos, ajustar a visualização do mapa para englobar todos eles
             if (validEvents.length > 1) {
-                const group = new L.featureGroup(eventMarkers);
+                const group = new L.featureGroup(markerObjects.map(o => o.marker));
                 map.fitBounds(group.getBounds().pad(0.15));
             } else if (validEvents.length === 1) {
                 map.setView([validEvents[0].lat, validEvents[0].lng], 15);
             }
             
-            // Variável para guardar o marcador do utilizador e círculo de precisão
+            // Variável para guardar o posicionamento do utilizador
+            let userLocation = null;
             let userMarker = null;
             let userAccuracyCircle = null;
+            let userSearchCircle = null;
             
             // Configurar geolocalização do utilizador
             const btnGeo = document.getElementById('btn-geolocation');
+            const radiusSlider = document.getElementById('radius-slider');
+            const radiusBadge = document.getElementById('radius-badge');
+            const radiusControlContainer = document.getElementById('radius-control-container');
+            const timeRadios = document.querySelectorAll('input[name="filter-time"]');
+            const eventCards = document.querySelectorAll('.event-card');
+            const emptyState = document.getElementById('events-filter-empty-state');
             const mapNotice = document.getElementById('map-notice');
             const mapNoticeText = document.getElementById('map-notice-text');
             
@@ -416,6 +568,152 @@
                 mapNotice.classList.remove('d-none');
             }
             
+            // Fórmula de Haversine em Javascript
+            function calcularDistanciaKm(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Raio da Terra em km
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLon = (lon2 - lon1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            }
+            
+            // Lógica de Filtragem Unificada
+            function applyFilters() {
+                const radiusVal = parseFloat(radiusSlider.value);
+                const selectedTimeElement = document.querySelector('input[name="filter-time"]:checked');
+                const selectedTime = selectedTimeElement ? selectedTimeElement.value : 'todos';
+                const now = new Date();
+                
+                // Atualizar o badge do raio
+                radiusBadge.textContent = `${radiusVal} km`;
+                
+                // 1. Filtrar marcadores no mapa
+                markerObjects.forEach(item => {
+                    let isVisible = true;
+                    
+                    // Filtragem por distância (apenas se geolocalizado)
+                    if (userLocation) {
+                        const dist = calcularDistanciaKm(userLocation.lat, userLocation.lng, item.data.lat, item.data.lng);
+                        if (dist > radiusVal) {
+                            isVisible = false;
+                        }
+                    }
+                    
+                    // Filtragem por estado temporal
+                    if (isVisible) {
+                        const dataInicio = new Date(item.data.DataInicio);
+                        const dataFim = new Date(item.data.DataFim);
+                        
+                        if (selectedTime === 'decorrer') {
+                            if (now < dataInicio || now > dataFim) {
+                                isVisible = false;
+                            }
+                        } else if (selectedTime === 'brevemente') {
+                            if (dataInicio <= now) {
+                                isVisible = false;
+                            }
+                        } else { // 'todos' (esconder passados por padrão para manter limpo)
+                            if (dataFim < now) {
+                                isVisible = false;
+                            }
+                        }
+                    }
+                    
+                    // Aplicar visibilidade ao marcador do mapa
+                    if (isVisible) {
+                        if (!map.hasLayer(item.marker)) {
+                            map.addLayer(item.marker);
+                        }
+                    } else {
+                        if (map.hasLayer(item.marker)) {
+                            map.removeLayer(item.marker);
+                        }
+                    }
+                });
+                
+                // 2. Filtrar cards de eventos listados
+                let visibleCardsCount = 0;
+                eventCards.forEach(card => {
+                    const latAttr = card.getAttribute('data-lat');
+                    const lngAttr = card.getAttribute('data-lng');
+                    const lat = parseFloat(latAttr);
+                    const lng = parseFloat(lngAttr);
+                    const inicioStr = card.getAttribute('data-inicio');
+                    const fimStr = card.getAttribute('data-fim');
+                    
+                    let isVisible = true;
+                    
+                    // Filtragem por distância (apenas se geolocalizado)
+                    if (userLocation) {
+                        if (!isNaN(lat) && !isNaN(lng)) {
+                            const dist = calcularDistanciaKm(userLocation.lat, userLocation.lng, lat, lng);
+                            if (dist > radiusVal) {
+                                isVisible = false;
+                            }
+                        } else {
+                            // Se estiver geolocalizado e o evento não tiver coordenadas, ocultamos
+                            isVisible = false;
+                        }
+                    }
+                    
+                    // Filtragem por estado temporal
+                    if (isVisible && inicioStr && fimStr) {
+                        const dataInicio = new Date(inicioStr);
+                        const dataFim = new Date(fimStr);
+                        
+                        if (selectedTime === 'decorrer') {
+                            if (now < dataInicio || now > dataFim) {
+                                isVisible = false;
+                            }
+                        } else if (selectedTime === 'brevemente') {
+                            if (dataInicio <= now) {
+                                isVisible = false;
+                            }
+                        } else { // 'todos'
+                            if (dataFim < now) {
+                                isVisible = false;
+                            }
+                        }
+                    }
+                    
+                    // Aplicar visibilidade ao card de HTML
+                    if (isVisible) {
+                        card.style.display = 'block';
+                        card.classList.remove('d-none');
+                        visibleCardsCount++;
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.add('d-none');
+                    }
+                });
+                
+                // Show empty state if no events are visible
+                if (emptyState) {
+                    if (visibleCardsCount === 0) {
+                        emptyState.classList.remove('d-none');
+                    } else {
+                        emptyState.classList.add('d-none');
+                    }
+                }
+            }
+            
+            // Ouvintes de eventos nos controlos de filtro
+            radiusSlider.addEventListener('input', function () {
+                const radiusVal = parseFloat(radiusSlider.value);
+                if (userSearchCircle && userLocation) {
+                    userSearchCircle.setRadius(radiusVal * 1000);
+                }
+                applyFilters();
+            });
+            
+            timeRadios.forEach(radio => {
+                radio.addEventListener('change', applyFilters);
+            });
+            
+            // Tratar Clique do Botão de Geolocalização
             btnGeo.addEventListener('click', function () {
                 btnGeo.disabled = true;
                 const originalText = btnGeo.innerHTML;
@@ -434,12 +732,22 @@
                         const userLng = position.coords.longitude;
                         const accuracy = position.coords.accuracy;
                         
-                        // Remover marcador anterior se existir
+                        userLocation = { lat: userLat, lng: userLng };
+                        
+                        // Ativar controlos do slider de raio
+                        radiusSlider.removeAttribute('disabled');
+                        radiusControlContainer.style.opacity = '1';
+                        radiusControlContainer.style.pointerEvents = 'auto';
+                        
+                        // Remover elementos anteriores do mapa
                         if (userMarker) {
                             map.removeLayer(userMarker);
                         }
                         if (userAccuracyCircle) {
                             map.removeLayer(userAccuracyCircle);
+                        }
+                        if (userSearchCircle) {
+                            map.removeLayer(userSearchCircle);
                         }
                         
                         // Adicionar círculo de precisão
@@ -449,6 +757,17 @@
                             fillColor: '#3b82f6',
                             fillOpacity: 0.15,
                             weight: 1
+                        }).addTo(map);
+                        
+                        // Adicionar círculo dinâmico de raio de pesquisa
+                        const radiusVal = parseFloat(radiusSlider.value);
+                        userSearchCircle = L.circle([userLat, userLng], {
+                            radius: radiusVal * 1000,
+                            color: '#4f46e5',
+                            fillColor: '#6366f1',
+                            fillOpacity: 0.08,
+                            weight: 2,
+                            dashArray: '5, 5'
                         }).addTo(map);
                         
                         // Adicionar marcador do utilizador
@@ -461,8 +780,8 @@
                             `)
                             .addTo(map);
                             
-                        // Centrar mapa na localização do utilizador
-                        map.setView([userLat, userLng], 15);
+                        // Centrar mapa na localização do utilizador e ajustar zoom
+                        map.setView([userLat, userLng], 13);
                         
                         btnGeo.innerHTML = `<i class="bi bi-geo-alt-fill"></i> Localização Atualizada`;
                         btnGeo.disabled = false;
@@ -470,6 +789,9 @@
                         btnGeo.classList.add('btn-success');
                         
                         showNotice("Localização obtida com sucesso!");
+                        
+                        // Aplicar a filtragem com as novas coordenadas
+                        applyFilters();
                     },
                     function (error) {
                         console.error(error);
@@ -508,6 +830,10 @@
                     minute: '2-digit'
                 });
             }
+            
+            // Inicializar filtros para limpar eventos passados no primeiro carregamento
+            applyFilters();
         });
     </script>
 }
+

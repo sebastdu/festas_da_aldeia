@@ -37,11 +37,13 @@ namespace festas_da_aldeia_pages.Pages
 
         public async Task OnGetAsync()
         {
-            // Obter os próximos 3 eventos
+            // Obter os próximos eventos (que ainda não terminaram)
+            var agora = DateTime.Now;
             EventosProximos = await _context.Eventos
                 .Include(e => e.Local)
+                .Where(e => e.DataFim >= agora)
                 .OrderBy(e => e.DataInicio)
-                .Take(3)
+                .Take(6)
                 .ToListAsync();
 
             // Obter os 3 primeiros locais registados
