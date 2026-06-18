@@ -27,7 +27,7 @@
                         <i class="bi bi-person me-1"></i>Artista
                         <span class="text-danger ms-1">*</span>
                     </label>
-                    <select asp-for="Cartaz.IdArtista" asp-items="Model.ArtistasSelectList"
+                    <select asp-for="Cartaz.IdArtista" asp-items="ViewBag.IdArtista"
                             class="form-select form-control-custom" aria-required="true">
                         <option value="">-- Selecionar artista --</option>
                     </select>
@@ -39,7 +39,7 @@
                         <i class="bi bi-calendar2 me-1"></i>Evento
                         <span class="text-danger ms-1">*</span>
                     </label>
-                    <select asp-for="Cartaz.IdEvento" asp-items="Model.EventosSelectList"
+                    <select asp-for="Cartaz.IdEvento" asp-items="ViewBag.IdEvento"
                             class="form-select form-control-custom" aria-required="true">
                         <option value="">-- Selecionar evento --</option>
                     </select>

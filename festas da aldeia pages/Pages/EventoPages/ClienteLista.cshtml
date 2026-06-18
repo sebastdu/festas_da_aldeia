@@ -1,0 +1,104 @@
+@page
+@model festas_da_aldeia_pages.Pages.EventoPages.ClienteListaModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = "Eventos";
+    var ptPT = new CultureInfo("pt-PT");
+    var agora = DateTime.Now;
+    string[] grads = [
+        "linear-gradient(135deg,#4f46e5,#7c3aed)",
+        "linear-gradient(135deg,#0ea5e9,#2563eb)",
+        "linear-gradient(135deg,#f59e0b,#ef4444)",
+        "linear-gradient(135deg,#10b981,#059669)",
+        "linear-gradient(135deg,#ec4899,#8b5cf6)",
+        "linear-gradient(135deg,#14b8a6,#0ea5e9)",
+    ];
+}
+
+<div class="page-header-container mb-4">
+    <h1 class="page-title-gradient mb-1"><i class="bi bi-calendar-event me-2"></i>Eventos</h1>
+    <p class="text-muted mb-0" style="font-size:0.95rem;">Todos os espetáculos e celebrações das festas</p>
+</div>
+
+@if (!Model.Eventos.Any())
+{
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-calendar-x" style="font-size:3rem;opacity:0.3;"></i>
+        <p class="mt-3">Ainda não existem eventos registados.</p>
+    </div>
+}
+else
+{
+    <div class="eventos-cliente-grid">
+        @foreach (var item in Model.Eventos)
+        {
+            var emCurso = item.DataInicio <= agora && item.DataFim >= agora;
+            var passado = item.DataFim < agora;
+            var duraDias = (item.DataFim.Date - item.DataInicio.Date).Days + 1;
+            var grad = grads[item.IdEvento % grads.Length];
+            var clienteUrl = Url.Page("./Cliente", new { id = item.IdEvento });
+
+            <div class="evento-cliente-card @(emCurso ? "evento-cliente-card-live" : passado ? "evento-cliente-card-past" : "")">
+                <a href="@clienteUrl" class="evento-card-link" aria-label="Ver @item.Nome"></a>
+
+                <div class="evento-cliente-card-banner" style="background: @grad;">
+                    <div class="evento-cliente-card-overlay">
+                        @if (emCurso)
+                        {
+                            <span class="badge-live mb-1"><i class="bi bi-circle-fill me-1"></i>Em curso</span>
+                        }
+                        else if (passado)
+                        {
+
+                            <span class="badge-past mb-1"><i class="bi bi-check-circle me-1"></i>Concluído</span>
+                        }
+                        @if (duraDias > 1)
+                        {
+                            <span class="evento-cliente-card-dias">@duraDias dias</span>
+                        }
+                    </div>
+                </div>
+
+                <div class="evento-cliente-card-body">
+                    <h5 class="evento-cliente-card-nome">@item.Nome</h5>
+                    <div class="evento-cliente-card-meta">
+                        <span>
+                            <i class="bi bi-calendar3 me-1"></i>
+                            @item.DataInicio.ToString("d MMM", ptPT)
+                            @if (duraDias > 1)
+                            {
+                                <text> — @item.DataFim.ToString("d MMM yyyy", ptPT)</text>
+                            }
+                            else
+                            {
+
+                                <text> @item.DataInicio.Year</text>
+                            }
+                        </span>
+                        <span><i class="bi bi-clock me-1"></i>@item.DataInicio.ToString("HH:mm") — @item.DataFim.ToString("HH:mm")</span>
+                        @if (item.Local != null)
+                        {
+                            <span><i class="bi bi-geo-alt-fill text-danger me-1"></i>@item.Local.Nome</span>
+                        }
+                        @if (item.Cartazes.Any())
+                        {
+                            <span class="artista-banner-atuacoes">
+                                <i class="bi bi-music-note-list me-1"></i>@item.Cartazes.Count atuaç@(item.Cartazes.Count != 1 ? "ões" : "ão")
+                            </span>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string>();
+}
+<partial name="_Paginacao" />

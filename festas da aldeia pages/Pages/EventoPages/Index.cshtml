@@ -7,16 +7,14 @@
 
 <div class="page-header-container d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
     <div>
-        <h1 class="page-title-gradient mb-1">Eventos</h1>
+        <h1 class="page-title-gradient mb-1"><i class="bi bi-calendar-event me-2"></i>Eventos</h1>
         <p class="text-muted mb-0">Consulte e planeie a agenda de espetáculos e celebrações nas festas.</p>
     </div>
     @if (User.IsInRole("Admin"))
     {
-        <div>
-            <a asp-page="Create" class="btn btn-primary shadow-sm">
-                <i class="bi bi-calendar-plus"></i> Adicionar Novo Evento
-            </a>
-        </div>
+        <a asp-page="Create" class="btn btn-primary shadow-sm">
+            <i class="bi bi-calendar-plus"></i> Adicionar Novo Evento
+        </a>
     }
 </div>
 
@@ -47,7 +45,6 @@ else
                 <div class="card h-100 card-custom">
                     <div class="card-body-custom d-flex flex-column h-100 justify-content-between">
                         <div>
-                            <!-- Cabeçalho do Cartão -->
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div class="card-icon-container mb-0">
                                     <i class="bi bi-music-player-fill text-primary"></i>
@@ -58,7 +55,6 @@ else
                                 </span>
                             </div>
 
-                            <!-- Nome e Descrição -->
                             <h4 class="card-title fw-bold mb-2">@item.Nome</h4>
                             @if (!string.IsNullOrEmpty(item.Descricao))
                             {
@@ -66,17 +62,17 @@ else
                             }
                             else
                             {
+
                                 <p class="text-muted card-text small fst-italic mb-3">Sem descrição disponível.</p>
                             }
                         </div>
 
                         <div>
-                            <!-- Dados do Evento -->
                             <div class="bg-light rounded-3 p-3 border mb-4">
                                 <div class="d-flex align-items-center mb-2 small text-dark">
                                     <i class="bi bi-geo-alt-fill text-danger me-2"></i>
                                     <span>
-                                        Local: 
+                                        Local:
                                         @if (item.Local != null)
                                         {
                                             <a asp-page="/LocalPages/Details" asp-route-id="@item.IdLocal" class="text-decoration-none fw-semibold">
@@ -85,26 +81,24 @@ else
                                         }
                                         else
                                         {
+
                                             <span class="text-muted">Desconhecido</span>
                                         }
                                     </span>
                                 </div>
-
                                 <div class="d-flex align-items-center mb-2 small text-dark">
                                     <i class="bi bi-calendar3 text-primary me-2"></i>
                                     <span>@item.DataInicio.ToString("dd MMM yyyy, HH:mm")</span>
                                 </div>
-
                                 @if (!string.IsNullOrEmpty(item.Patrocinador))
                                 {
                                     <div class="d-flex align-items-center small text-dark">
                                         <i class="bi bi-award-fill text-warning me-2"></i>
-                                        <span>Patrocínio: <strong class="fw-semibold">@item.Patrocinador</strong></span>
+                                        <span>Patrocínio: <strong>@item.Patrocinador</strong></span>
                                     </div>
                                 }
                             </div>
 
-                            <!-- Footer do Cartão -->
                             <div class="d-flex justify-content-between align-items-center pt-3 border-top">
                                 <div class="d-flex gap-2">
                                     @if (User.IsInRole("Admin"))
@@ -131,3 +125,12 @@ else
         }
     </div>
 }
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string>();
+}
+<partial name="_Paginacao" />

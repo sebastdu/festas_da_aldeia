@@ -55,6 +55,7 @@ else
                                     }
                                     else
                                     {
+
                                         <i class="bi bi-house-door-fill text-primary" title="Espaço Interior"></i>
                                     }
                                 </div>
@@ -65,20 +66,20 @@ else
                             </div>
 
                             <h4 class="card-title fw-bold mb-2">@item.Nome</h4>
-                            
                             @if (!string.IsNullOrEmpty(item.Descricao))
                             {
                                 <p class="text-muted card-text small mb-3">@item.Descricao</p>
                             }
                             else
                             {
+
                                 <p class="text-muted card-text small fst-italic mb-3">Sem descrição disponível.</p>
                             }
                         </div>
 
                         <div>
                             <div class="mb-4">
-                                <h6 class="text-uppercase text-muted fw-bold small mb-2" style="font-size: 0.75rem; letter-spacing: 0.05em;">
+                                <h6 class="text-uppercase text-muted fw-bold small mb-2" style="font-size:0.75rem;letter-spacing:0.05em;">
                                     <i class="bi bi-calendar-event me-1"></i> Eventos Associados
                                 </h6>
                                 @if (item.Eventos != null && item.Eventos.Any())
@@ -92,6 +93,7 @@ else
                                 }
                                 else
                                 {
+
                                     <span class="text-muted small fst-italic">Sem eventos agendados</span>
                                 }
                             </div>
@@ -122,3 +124,12 @@ else
         }
     </div>
 }
+
+@* ── PAGINAÇÃO ── *@
+@{
+    ViewData["PaginaAtual"] = Model.Pagina;
+    ViewData["TotalPaginas"] = Model.TotalPaginas;
+    ViewData["TotalItens"] = Model.TotalItens;
+    ViewData["RouteValues"] = new Dictionary<string, string>();
+}
+<partial name="_Paginacao" />
