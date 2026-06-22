@@ -21,11 +21,81 @@
     <p class="text-muted mb-0" style="font-size:0.95rem;">Todos os espetáculos e celebrações das festas</p>
 </div>
 
-@if (!Model.Eventos.Any())
+@* ── FILTROS ── *@
+<form method="get" class="mb-4">
+    <div class="card card-custom shadow-sm border-light-subtle">
+        <div class="card-body-custom p-3 p-md-4">
+            <div class="row g-3 align-items-end">
+                
+                <!-- Pesquisa por texto -->
+                <div class="col-md-5">
+                    <label class="form-label-custom mb-2 small text-muted">
+                        <i class="bi bi-search text-primary me-1"></i>Pesquisa
+                    </label>
+                    <input type="text" asp-for="Pesquisa" class="form-control form-control-custom" placeholder="Nome, descrição ou artista...">
+                </div>
+
+                <!-- Filtro por Local -->
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label-custom mb-2 small text-muted">
+                        <i class="bi bi-geo-alt-fill text-danger me-1"></i>Recinto / Local
+                    </label>
+                    <select asp-for="LocalId" class="form-select form-control-custom">
+                        <option value="">Todos os locais</option>
+                        @foreach (var local in Model.Locais)
+                        {
+                            <option value="@local.IdLocal">@local.Nome</option>
+                        }
+                    </select>
+                </div>
+
+                <!-- Filtro por Estado -->
+                <div class="col-md-3 col-sm-6">
+                    <label class="form-label-custom mb-2 small text-muted">
+                        <i class="bi bi-funnel-fill text-secondary me-1"></i>Estado
+                    </label>
+                    <select asp-for="Estado" class="form-select form-control-custom">
+                        <option value="">Todos os eventos</option>
+                        <option value="decorrer">A Decorrer (Hoje)</option>
+                        <option value="brevemente">Brevemente (Futuros)</option>
+                        <option value="passados">Concluídos (Passados)</option>
+                    </select>
+                </div>
+
+                <!-- Botões de Ação -->
+                <div class="col-md-1 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary w-100 py-2" title="Pesquisar" style="height: 42px;">
+                        <i class="bi bi-filter"></i>
+                    </button>
+                    @if (!string.IsNullOrEmpty(Model.Pesquisa) || Model.LocalId.HasValue || !string.IsNullOrEmpty(Model.Estado))
+                    {
+                        <a asp-page="./ClienteLista" class="btn btn-outline-secondary py-2 px-3" title="Limpar Filtros" style="height: 42px;">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
+
+@if (Model.BancoVazio)
 {
     <div class="text-center py-5 text-muted">
         <i class="bi bi-calendar-x" style="font-size:3rem;opacity:0.3;"></i>
         <p class="mt-3">Ainda não existem eventos registados.</p>
+    </div>
+}
+else if (!Model.Eventos.Any())
+{
+    <div class="landing-empty py-5 border-dashed">
+        <i class="bi bi-funnel-fill text-muted mb-3 d-block" style="font-size: 3rem; opacity: 0.3;"></i>
+        <h5 class="fw-bold">Nenhum evento encontrado</h5>
+        <p class="text-muted small">Nenhum resultado corresponde à sua pesquisa com os filtros atuais.</p>
+        <a asp-page="./ClienteLista" class="btn btn-primary btn-sm mt-2">
+            <i class="bi bi-x-lg"></i> Limpar Filtros
+        </a>
     </div>
 }
 else
@@ -50,21 +120,33 @@ else
                         }
                         else if (passado)
                         {
-
                             <span class="badge-past mb-1"><i class="bi bi-check-circle me-1"></i>Concluído</span>
                         }
+                        else
+                        {
+                            <span class="badge bg-light text-dark mb-1 py-1.5 px-2.5 rounded-pill fw-semibold small">
+                                <i class="bi bi-clock text-warning me-1"></i>Brevemente
+                            </span>
+                        }
+                        
                         @if (duraDias > 1)
                         {
                             <span class="evento-cliente-card-dias">@duraDias dias</span>
                         }
+                    </div>
+
+                    <!-- Glassmorphic Date Badge Overlay -->
+                    <div class="evento-cliente-card-date-badge">
+                        <span class="date-badge-day">@item.DataInicio.Day</span>
+                        <span class="date-badge-month">@item.DataInicio.ToString("MMM", ptPT).ToUpper().Replace(".", "")</span>
                     </div>
                 </div>
 
                 <div class="evento-cliente-card-body">
                     <h5 class="evento-cliente-card-nome">@item.Nome</h5>
                     <div class="evento-cliente-card-meta">
-                        <span>
-                            <i class="bi bi-calendar3 me-1"></i>
+                        <span class="meta-item">
+                            <i class="bi bi-calendar3 text-primary"></i>
                             @item.DataInicio.ToString("d MMM", ptPT)
                             @if (duraDias > 1)
                             {
@@ -72,21 +154,34 @@ else
                             }
                             else
                             {
-
                                 <text> @item.DataInicio.Year</text>
                             }
                         </span>
-                        <span><i class="bi bi-clock me-1"></i>@item.DataInicio.ToString("HH:mm") — @item.DataFim.ToString("HH:mm")</span>
+                        <span class="meta-item">
+                            <i class="bi bi-clock text-primary"></i>
+                            @item.DataInicio.ToString("HH:mm") — @item.DataFim.ToString("HH:mm")
+                        </span>
                         @if (item.Local != null)
                         {
-                            <span><i class="bi bi-geo-alt-fill text-danger me-1"></i>@item.Local.Nome</span>
+                            <span class="meta-item">
+                                <i class="bi bi-geo-alt-fill text-danger"></i>
+                                @item.Local.Nome
+                            </span>
                         }
+                    </div>
+
+                    <div class="mt-3 pt-2.5 border-top d-flex align-items-center justify-content-between" style="border-color: var(--border-light) !important;">
                         @if (item.Cartazes.Any())
                         {
-                            <span class="artista-banner-atuacoes">
+                            <span class="artista-banner-atuacoes m-0">
                                 <i class="bi bi-music-note-list me-1"></i>@item.Cartazes.Count atuaç@(item.Cartazes.Count != 1 ? "ões" : "ão")
                             </span>
                         }
+                        else
+                        {
+                            <span></span>
+                        }
+                        <span class="text-primary fw-bold small">Ver Detalhes <i class="bi bi-chevron-right small"></i></span>
                     </div>
                 </div>
             </div>
@@ -99,6 +194,11 @@ else
     ViewData["PaginaAtual"] = Model.Pagina;
     ViewData["TotalPaginas"] = Model.TotalPaginas;
     ViewData["TotalItens"] = Model.TotalItens;
-    ViewData["RouteValues"] = new Dictionary<string, string>();
+    
+    var routeValues = new Dictionary<string, string>();
+    if (!string.IsNullOrEmpty(Model.Pesquisa)) routeValues["Pesquisa"] = Model.Pesquisa;
+    if (Model.LocalId.HasValue) routeValues["LocalId"] = Model.LocalId.Value.ToString();
+    if (!string.IsNullOrEmpty(Model.Estado)) routeValues["Estado"] = Model.Estado;
+    ViewData["RouteValues"] = routeValues;
 }
 <partial name="_Paginacao" />
