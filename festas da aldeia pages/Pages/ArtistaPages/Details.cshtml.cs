@@ -17,6 +17,9 @@ public class DetailsModel : PageModel
 
     public Artista Artista { get; set; } = default!;
 
+    [BindProperty(SupportsGet = true)]
+    public string? From { get; set; }
+
     public async Task<IActionResult> OnGetAsync(int? id)
     {
         if (id is null) return NotFound();

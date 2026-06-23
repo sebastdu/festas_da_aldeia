@@ -16,9 +16,18 @@
 }
 
 <div class="mb-3">
-    <a asp-page="./Index" class="back-link d-inline-flex align-items-center gap-1">
-        <i class="bi bi-arrow-left"></i> Voltar aos artistas
-    </a>
+    @if (Model.From == "admin")
+    {
+        <a asp-page="./Admin" class="back-link d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Voltar à gestão de artistas
+        </a>
+    }
+    else
+    {
+        <a asp-page="./Index" class="back-link d-inline-flex align-items-center gap-1">
+            <i class="bi bi-arrow-left"></i> Voltar aos artistas
+        </a>
+    }
 </div>
 
 <div class="row g-4">
@@ -27,7 +36,6 @@
     <div class="col-lg-4 col-md-5">
         <div class="artista-details-card">
 
-            @* Foto *@
             <div class="artista-details-foto">
                 @if (!string.IsNullOrEmpty(fotoUrl))
                 {
@@ -41,7 +49,6 @@
                 }
             </div>
 
-            @* Nome *@
             <div class="artista-details-body">
                 <h2 class="artista-details-nome">@Model.Artista.Nome</h2>
 
@@ -62,6 +69,26 @@
                     <p class="text-muted fst-italic" style="font-size:0.9rem;">Sem biografia disponível.</p>
                 }
 
+                @* Contacto — só Admin *@
+                @if (User.IsInRole("Admin") && !string.IsNullOrEmpty(Model.Artista.Contacto))
+                {
+                    <div class="artista-details-contacto">
+                        <i class="bi bi-telephone-fill me-2"></i>@Model.Artista.Contacto
+                    </div>
+                }
+
+                @* Botões Admin *@
+                @if (User.IsInRole("Admin"))
+                {
+                    <div class="d-flex gap-2 mt-3">
+                        <a asp-page="./Edit" asp-route-id="@Model.Artista.IdArtista" class="btn btn-primary btn-sm">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                        <a asp-page="./Delete" asp-route-id="@Model.Artista.IdArtista" class="btn btn-outline-danger btn-sm">
+                            <i class="bi bi-trash me-1"></i> Eliminar
+                        </a>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -88,13 +115,24 @@
                     var agora = DateTime.Now;
                     var emCurso = cartaz.DataHoraAtuacao <= agora && fim >= agora;
                     var passado = fim < agora;
+                    var eventoUrl = cartaz.Evento != null
+                        ? Url.Page("/EventoPages/Cliente", new { id = cartaz.Evento.IdEvento })
+                        : null;
 
-                    <div class="cartaz-banner @(emCurso ? "cartaz-banner-live" : passado ? "cartaz-banner-past" : "")">
+                    <div class="cartaz-banner @(emCurso ? "cartaz-banner-live" : passado ? "cartaz-banner-past" : "") @(eventoUrl != null ? "cartaz-banner-clickable" : "")">
+
+                        @* Link invisível para o evento *@
+                        @if (eventoUrl != null)
+                        {
+                            <a href="@eventoUrl" class="cartaz-banner-link" aria-label="Ver evento @cartaz.Evento!.Nome"></a>
+                        }
+
                         <div class="cartaz-banner-data">
                             <span class="cartaz-dia">@cartaz.DataHoraAtuacao.ToString("ddd", ptPT).ToUpper()</span>
                             <span class="cartaz-num">@cartaz.DataHoraAtuacao.Day</span>
                             <span class="cartaz-mes">@cartaz.DataHoraAtuacao.ToString("MMM", ptPT).ToUpper()</span>
                         </div>
+
                         <div class="cartaz-banner-info">
                             <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
                                 @if (emCurso)
@@ -103,6 +141,7 @@
                                 }
                                 else if (passado)
                                 {
+
                                     <span class="badge-past"><i class="bi bi-check-circle me-1"></i>Concluída</span>
                                 }
                                 <span class="cartaz-hora">
@@ -113,7 +152,13 @@
                             </div>
                             @if (cartaz.Evento != null)
                             {
-                                <div class="cartaz-evento-nome">@cartaz.Evento.Nome</div>
+                                <div class="cartaz-evento-nome">
+                                    @cartaz.Evento.Nome
+                                    @if (eventoUrl != null)
+                                    {
+                                        <i class="bi bi-arrow-right ms-1" style="font-size:0.75rem;opacity:0.5;"></i>
+                                    }
+                                </div>
                                 @if (cartaz.Evento.Local != null)
                                 {
                                     <div class="cartaz-local">

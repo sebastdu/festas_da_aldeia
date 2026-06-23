@@ -1,0 +1,108 @@
+@page
+@model festas_da_aldeia_pages.Pages.LocalPages.ListaLocaisModel
+
+@{
+    ViewData["Title"] = "Locais";
+}
+
+<div class="page-header-container mb-4">
+    <h1 class="page-title-gradient mb-1"><i class="bi bi-geo-alt me-2"></i>Locais</h1>
+    <p class="text-muted mb-0" style="font-size:0.95rem;">Conheça os espaços das festividades</p>
+</div>
+
+@* ── PESQUISA + FILTROS ── *@
+<form method="get" class="mb-4">
+    <div class="cartaz-search-wrapper mb-3">
+        <i class="bi bi-search cartaz-search-icon"></i>
+        <input type="text" name="Pesquisa" value="@Model.Pesquisa"
+               class="cartaz-search-input"
+               placeholder="Pesquisar por nome do local…"
+               autocomplete="off" />
+        @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+        {
+            <a asp-page="./ListaLocais" asp-route-Filtro="@Model.Filtro" class="cartaz-search-clear" title="Limpar">
+                <i class="bi bi-x-lg"></i>
+            </a>
+        }
+        <button type="submit" class="cartaz-search-btn">Pesquisar</button>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <span class="text-muted" style="font-size:0.85rem;font-weight:600;">Filtrar:</span>
+        @foreach (var (val, label, icon) in new[] {
+            ("",         "Todos",    "bi-grid"),
+            ("exterior", "Exterior", "bi-sun"),
+            ("interior", "Interior", "bi-building"),
+        })
+        {
+            var ativo = (Model.Filtro ?? "") == val;
+            <a asp-page="./ListaLocais"
+                   asp-route-Pesquisa="@Model.Pesquisa"
+                   asp-route-Filtro="@val"
+                   class="artista-ordem-btn @(ativo ? "ativo" : "")">
+                <i class="bi @icon me-1"></i>@label
+            </a>
+        }
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.Pesquisa) || !string.IsNullOrWhiteSpace(Model.Filtro))
+    {
+        <p class="mt-2 mb-0 text-muted" style="font-size:0.85rem;">
+            <i class="bi bi-funnel me-1"></i>
+            @Model.Locais.Count local@(Model.Locais.Count != 1 ? "is" : "")
+            @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+            {
+                <text> para "<strong>@Model.Pesquisa</strong>"</text>
+            }
+        </p>
+    }
+</form>
+
+@* ── GRELHA ── *@
+@if (!Model.Locais.Any())
+{
+    <div class="text-center py-5 text-muted">
+        <i class="bi bi-geo-alt" style="font-size:3rem;opacity:0.3;"></i>
+        <p class="mt-3">
+            @if (!string.IsNullOrWhiteSpace(Model.Pesquisa))
+            {
+                <text>Nenhum local encontrado para "<strong>@Model.Pesquisa</strong>".</text>
+            }
+            else
+            {
+
+                <text>Ainda não existem locais registados.</text>
+            }
+        </p>
+    </div>
+}
+else
+{
+    <div class="locais-clientes-grid">
+        @foreach (var item in Model.Locais)
+        {
+            var detailUrl = Url.Page("./PaginaLocais", new { id = item.IdLocal });
+
+            <div class="local-cliente-card">
+                <a href="@detailUrl" class="local-cliente-card-link" aria-label="Ver @item.Nome"></a>
+
+                <div class="local-cliente-card-img">
+                    <i class="bi @(item.Outside ? "bi-sun" : "bi-building")"></i>
+                    <span class="local-cliente-card-badge @(item.Outside ? "badge-exterior" : "badge-indoor-pill")">
+                        @(item.Outside ? "Exterior" : "Interior")
+                    </span>
+                </div>
+
+                <div class="local-cliente-card-body">
+                    <h5 class="local-cliente-card-nome">@item.Nome</h5>
+                    @if (item.Eventos.Any())
+                    {
+                        <span class="artista-banner-atuacoes">
+                            <i class="bi bi-calendar-event me-1"></i>@item.Eventos.Count evento@(item.Eventos.Count != 1 ? "s" : "")
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+}

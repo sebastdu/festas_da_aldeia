@@ -1,0 +1,148 @@
+@page "{id:int}"
+@model festas_da_aldeia_pages.Pages.LocalPages.PaginaLocaisModel
+@using System.Globalization
+
+@{
+    ViewData["Title"] = Model.Local.Nome;
+    var ptPT = new CultureInfo("pt-PT");
+    var agora = DateTime.Now;
+
+    var temMapa = false;
+    double lat = 0, lng = 0;
+    if (!string.IsNullOrEmpty(Model.Local.Coordenadas))
+    {
+        var partes = Model.Local.Coordenadas.Trim().Split(',');
+        if (partes.Length == 2 &&
+            double.TryParse(partes[0].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lat) &&
+            double.TryParse(partes[1].Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out lng))
+        {
+            temMapa = true;
+        }
+    }
+}
+
+<div class="mb-3">
+    <a asp-page="./ListaLocais" class="back-link d-inline-flex align-items-center gap-1">
+        <i class="bi bi-arrow-left"></i> Voltar aos locais
+    </a>
+</div>
+
+@* ── CABEÇALHO ── *@
+<div class="d-flex align-items-center gap-3 mb-4">
+    <div class="local-detalhe-icone @(Model.Local.Outside ? "exterior" : "interior")">
+        <i class="bi @(Model.Local.Outside ? "bi-sun" : "bi-building")"></i>
+    </div>
+    <div>
+        <h1 class="fw-bold mb-1" style="font-size:clamp(1.4rem,3vw,2rem);">@Model.Local.Nome</h1>
+        @if (Model.Local.Outside)
+        {
+            <span class="badge-exterior"><i class="bi bi-sun me-1"></i>Espaço Exterior</span>
+        }
+        else
+        {
+
+            <span class="badge-indoor-pill"><i class="bi bi-building me-1"></i>Espaço Interior</span>
+        }
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.Local.Descricao))
+{
+    <p class="mb-4" style="font-size:0.95rem;line-height:1.7;color:var(--text-muted);">@Model.Local.Descricao</p>
+}
+
+<div class="row g-4">
+
+    @* ── MAPA ── *@
+    <div class="col-lg-6">
+        <h5 class="fw-bold mb-3"><i class="bi bi-map me-2 text-primary"></i>Localização</h5>
+        @if (temMapa)
+        {
+            <div id="mapa-local" class="evento-mapa-wrapper"></div>
+        }
+        else
+        {
+            <div class="landing-empty">
+                <i class="bi bi-map"></i>
+                <p class="mb-0">Sem coordenadas registadas para este local.</p>
+            </div>
+        }
+    </div>
+
+    @* ── EVENTOS ── *@
+    <div class="col-lg-6">
+        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i>Eventos neste local</h5>
+
+        @if (!Model.Local.Eventos.Any())
+        {
+            <div class="landing-empty">
+                <i class="bi bi-calendar-x"></i>
+                <p class="mb-0">Sem eventos programados para este local.</p>
+            </div>
+        }
+        else
+        {
+            <div class="d-flex flex-column gap-2">
+                @foreach (var ev in Model.Local.Eventos.OrderBy(e => e.DataInicio))
+                {
+                    var emCurso = ev.DataInicio <= agora && ev.DataFim >= agora;
+                    var passado = ev.DataFim < agora;
+                    var clienteUrl = Url.Page("/EventoPages/Cliente", new { id = ev.IdEvento });
+
+                    <a href="@clienteUrl" class="local-evento-row text-decoration-none">
+                        <div class="local-evento-row-info">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <span class="fw-bold" style="font-size:0.95rem;color:var(--text-main);">@ev.Nome</span>
+                                @if (emCurso)
+                                {
+                                    <span class="badge-live"><i class="bi bi-circle-fill me-1"></i>Em curso</span>
+                                }
+                                else if (passado)
+                                {
+
+                                    <span class="badge-past"><i class="bi bi-check-circle me-1"></i>Concluído</span>
+                                }
+                            </div>
+                            <div class="text-muted" style="font-size:0.8rem;">
+                                <i class="bi bi-calendar3 me-1"></i>
+                                @ev.DataInicio.ToString("d 'de' MMMM 'de' yyyy", ptPT)
+                                <span class="mx-2">·</span>
+                                <i class="bi bi-clock me-1"></i>
+                                @ev.DataInicio.ToString("HH:mm") — @ev.DataFim.ToString("HH:mm")
+                            </div>
+                        </div>
+                        <i class="bi bi-arrow-right text-muted flex-shrink-0" style="font-size:0.85rem;"></i>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+@if (temMapa)
+{
+    @section Scripts {
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        <script>
+            (function () {
+            var map = L.map('mapa-local').setView([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], 15);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+            maxZoom: 19
+            }).addTo(map);
+            var icon = L.divIcon({
+            className: '',
+            html: '<div class="mapa-marker"><i class="bi bi-geo-alt-fill"></i></div>',
+            iconSize: [40, 40], iconAnchor: [20, 40], popupAnchor: [0, -42]
+            });
+            L.marker([@lat.ToString(CultureInfo.InvariantCulture), @lng.ToString(CultureInfo.InvariantCulture)], { icon: icon })
+            .addTo(map)
+            .bindPopup(
+            '<div class="mapa-popup"><strong>@Html.Raw(Model.Local.Nome)</strong>' +
+            '<br><a href="https://www.google.com/maps?q=@lat.ToString(CultureInfo.InvariantCulture),@lng.ToString(CultureInfo.InvariantCulture)" target="_blank" class="mapa-popup-dir"><i class="bi bi-signpost-2 me-1"></i>Obter direções</a></div>'
+            ).openPopup();
+            })();
+        </script>
+    }
+}
