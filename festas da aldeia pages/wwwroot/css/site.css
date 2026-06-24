@@ -1708,3 +1708,144 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 1;
     border-radius: var(--radius-lg);
 }
+
+
+/* ============================================
+   LOCAIS CLIENTES — GRELHA
+   ============================================ */
+
+.locais-clientes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1.25rem;
+}
+
+.local-cliente-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    flex-direction: column;
+}
+
+    .local-cliente-card:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-3px);
+    }
+
+.local-cliente-card-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius-lg);
+}
+
+.local-cliente-card-img {
+    width: 100%;
+    aspect-ratio: 4/3;
+    background: rgba(99,102,241,0.06);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.5rem;
+    color: rgba(99,102,241,0.25);
+}
+
+.local-cliente-card-badge {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.65rem;
+}
+
+.badge-indoor-pill {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(59,130,246,0.12);
+    color: #2563eb;
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+}
+
+.local-cliente-card-body {
+    padding: 0.85rem 1rem;
+}
+
+.local-cliente-card-nome {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-main);
+    margin: 0 0 0.3rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── DETALHE DO LOCAL ── */
+
+.local-detalhe-icone {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+    .local-detalhe-icone.exterior {
+        background: rgba(245,158,11,0.1);
+        color: #d97706;
+    }
+
+    .local-detalhe-icone.interior {
+        background: rgba(59,130,246,0.1);
+        color: #2563eb;
+    }
+
+.local-evento-row {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-light);
+    border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+    .local-evento-row:hover {
+        border-color: var(--primary-color);
+        box-shadow: var(--shadow-sm);
+    }
+
+.local-evento-row-info {
+    flex: 1;
+    min-width: 0;
+}
+
+/* cartaz-banner clicável */
+.cartaz-banner-clickable {
+    position: relative;
+    cursor: pointer;
+}
+
+    .cartaz-banner-clickable:hover {
+        box-shadow: var(--shadow-md);
+        transform: translateY(-2px);
+        border-color: rgba(99,102,241,0.3);
+    }
+
+.cartaz-banner-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius-lg);
+}
