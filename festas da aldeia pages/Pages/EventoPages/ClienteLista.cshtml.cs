@@ -24,6 +24,7 @@ public class ClienteListaModel : PageModel
     [BindProperty(SupportsGet = true)] public string? Pesquisa { get; set; }
     [BindProperty(SupportsGet = true)] public int? LocalId { get; set; }
     [BindProperty(SupportsGet = true)] public string? Estado { get; set; }
+    [BindProperty(SupportsGet = true)] public DateTime? Data { get; set; }
 
     public int TotalPaginas { get; set; }
     public int TotalItens { get; set; }
@@ -72,7 +73,19 @@ public class ClienteListaModel : PageModel
             }
         }
 
-        query = query.OrderBy(e => e.DataInicio);
+        // 4. Filtro de Data (eventos ativos no dia selecionado)
+        if (Data.HasValue)
+        {
+            var d = Data.Value.Date;
+            query = query.Where(e => e.DataInicio.Date <= d && e.DataFim.Date >= d);
+        }
+
+        // Ordenação por Estado (Em Curso -> Brevemente -> Concluídos) e depois por DataInicio
+        var agoraParaOrdem = DateTime.Now;
+        query = query
+            .OrderBy(e => (e.DataInicio <= agoraParaOrdem && e.DataFim >= agoraParaOrdem) ? 0 :
+                          (e.DataInicio > agoraParaOrdem) ? 1 : 2)
+            .ThenBy(e => e.DataInicio);
 
         TotalItens = await query.CountAsync();
         TotalPaginas = (int)Math.Ceiling(TotalItens / (double)ItensPorPagina);
