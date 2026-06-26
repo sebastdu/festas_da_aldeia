@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.LocalPages;
 /// Permite carregar e expor as informações completas de um local específico (como mapa e recintos) 
 /// e listar todos os eventos atualmente agendados para este espaço.
 /// </summary>
+[Authorize]
 public class DetailsModel : PageModel
 {
     /// <summary>

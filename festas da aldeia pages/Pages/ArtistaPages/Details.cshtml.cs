@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.ArtistaPages;
 /// Carrega a ficha informativa de um artista, incluindo a sua foto, biografia, 
 /// e toda a sua agenda de atuações (eventos e respetivos locais).
 /// </summary>
+[Authorize]
 public class DetailsModel : PageModel
 {
     /// <summary>

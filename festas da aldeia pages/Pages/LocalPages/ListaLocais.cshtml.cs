@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.LocalPages;
 /// Fornece funcionalidades de pesquisa por termo de texto e filtragem dinâmica (espaço exterior vs. interior),
 /// gerando uma lista filtrada ordenada alfabeticamente.
 /// </summary>
+[Authorize]
 public class ListaLocaisModel : PageModel
 {
     /// <summary>

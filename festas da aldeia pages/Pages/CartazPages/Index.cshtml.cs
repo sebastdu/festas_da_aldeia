@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace festas_da_aldeia_pages.Pages.CartazPages;
 /// Modelo da página de consulta pública e administração de Cartazes (atuações).
 /// Suporta filtros de pesquisa por artista, evento ou local, e paginação dos resultados obtidos.
 /// </summary>
+[Authorize]
 public class IndexModel : PageModel
 {
     /// <summary>

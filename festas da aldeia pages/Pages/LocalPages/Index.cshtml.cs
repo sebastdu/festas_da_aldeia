@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.LocalPages;
 /// Carrega e apresenta de forma paginada todos os locais (recintos) registados,
 /// incluindo a contagem de eventos associados a cada um.
 /// </summary>
+[Authorize]
 public class IndexModel : PageModel
 {
     /// <summary>

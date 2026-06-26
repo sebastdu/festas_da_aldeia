@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.EventoPages;
 /// Permite efetuar pesquisas por nome do artista, evento ou local, filtrar pelo estado do evento
 /// (em curso, brevemente, concluídos) e realizar a paginação de forma flexível.
 /// </summary>
+[Authorize]
 public class ClienteListaModel : PageModel
 {
     /// <summary>

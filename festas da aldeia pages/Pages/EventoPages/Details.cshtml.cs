@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.EventoPages;
 /// Carrega de forma otimizada os dados geográficos do local e as atuações agendadas no cartaz,
 /// incluindo os dados biográficos e perfis dos respetivos artistas.
 /// </summary>
+[Authorize]
 public class DetailsModel : PageModel
 {
     /// <summary>
