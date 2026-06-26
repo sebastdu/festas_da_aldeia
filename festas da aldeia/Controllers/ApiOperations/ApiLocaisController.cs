@@ -6,12 +6,23 @@ using festas_da_aldeia.Models.Api;
 
 namespace festas_da_aldeia.Controllers.ApiOperations
 {
+    /// <summary>
+    /// Controlador da API REST para operações CRUD sobre Locais.
+    /// Gerido por endpoints HTTP.
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class ApiLocaisController : ControllerBase
     {
+        /// <summary>
+        /// Contexto de acesso à base de dados.
+        /// </summary>
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Inicializa uma nova instância do controlador de API de Locais.
+        /// </summary>
+        /// <param name="context">O contexto da base de dados da aplicação.</param>
         public ApiLocaisController(ApplicationDbContext context)
         {
             _context = context;
