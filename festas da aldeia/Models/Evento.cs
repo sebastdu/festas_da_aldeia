@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace festas_da_aldeia.Models
 {
     /// <summary>
-    /// Evento que ocorre no âmbito das festas da aldeia
+    /// Representa a entidade Evento no sistema RallyFestas.
+    /// Esta classe é encarregue de modelar cada atividade ou espetáculo (bailarico, concerto, certame) 
+    /// planeado no âmbito das festas da aldeia, controlando a sua calendarização, patrocinadores e ligação ao local onde ocorre.
     /// </summary>
     public class Evento
     {

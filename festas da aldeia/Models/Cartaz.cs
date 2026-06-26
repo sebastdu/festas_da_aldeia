@@ -1,10 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace festas_da_aldeia.Models
 {
     /// <summary>
-    /// Tabela de ligação entre Artistas e Eventos (cartaz de atuações)
+    /// Representa a entidade Cartaz no sistema RallyFestas.
+    /// Esta classe funciona como tabela de associação (muitos-para-muitos) entre as entidades Artista e Evento,
+    /// registando os dados específicos de cada atuação, tais como a data, hora de início e a duração prevista em minutos.
     /// </summary>
     public class Cartaz
     {

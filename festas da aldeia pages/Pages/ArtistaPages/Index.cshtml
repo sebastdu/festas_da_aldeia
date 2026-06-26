@@ -79,7 +79,7 @@ else
         @foreach (var item in Model.Artista)
         {
             var fotoUrl = item.LinkFotoPerfil;
-            if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+            if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("/") && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
                 fotoUrl = "https://" + fotoUrl;
 
             var detailsUrl = Url.Page("./Details", new { id = item.IdArtista });

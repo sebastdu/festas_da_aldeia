@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace festas_da_aldeia.Models
 {
     /// <summary>
-    /// Local onde os eventos podem acontecer
+    /// Representa a entidade Local no sistema RallyFestas.
+    /// Esta classe é encarregue de mapear os recintos e espaços físicos (praças, jardins, auditórios)
+    /// onde decorrem os eventos das festividades, gerindo informação de geolocalização e tipologia do espaço.
     /// </summary>
     public class Local
     {

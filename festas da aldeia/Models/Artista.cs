@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace festas_da_aldeia.Models
 {
     /// <summary>
-    /// Artista que pode atuar em eventos
+    /// Representa a entidade Artista no sistema RallyFestas.
+    /// Esta classe é encarregue de modelar os artistas (cantores, bandas, ranchos folclóricos) 
+    /// que atuam nas festividades, mantendo os seus dados pessoais, contactos, biografia e foto de perfil.
     /// </summary>
     public class Artista
     {
@@ -26,7 +28,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Biografia")]
         [StringLength(500, ErrorMessage = "A {0} deve ter um máximo de {1} caracteres.")]
-        public string Biografia { get; set; } = string.Empty;
+        public string? Biografia { get; set; }
 
         /// <summary>
         /// Contacto do artista (suporta formatos com +, espaços, etc.)
@@ -41,8 +43,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Foto de Perfil")]
         [StringLength(500, ErrorMessage = "O link deve ter um máximo de {1} caracteres.")]
-        [Url(ErrorMessage = "O link da foto de perfil deve ser uma URL válida.")]
-        public string LinkFotoPerfil { get; set; } = string.Empty;
+        public string? LinkFotoPerfil { get; set; }
 
         /*  ************************************** 
         *  Relationships

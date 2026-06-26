@@ -8,27 +8,55 @@ using festas_da_aldeia.Models;
 
 namespace festas_da_aldeia_pages.Pages.EventoPages;
 
+/// <summary>
+/// Modelo da página de criação de novos Eventos.
+/// Restrito a utilizadores com a função "Admin".
+/// Realiza várias validações de integridade temporal e espacial (ex: sobreposição de eventos no mesmo local).
+/// </summary>
 [Authorize(Roles = "Admin")]
 public class CreateModel : PageModel
 {
+    /// <summary>
+    /// Contexto de acesso à base de dados, injetado via construtor.
+    /// </summary>
     private readonly ApplicationDbContext _context;
 
+    /// <summary>
+    /// Construtor do modelo de criação de eventos.
+    /// </summary>
+    /// <param name="context">O contexto de base de dados da aplicação.</param>
     public CreateModel(ApplicationDbContext context)
     {
         _context = context;
     }
 
+    /// <summary>
+    /// Processa o pedido HTTP GET para inicializar o formulário de criação.
+    /// Preenche a dropdown de seleção do local.
+    /// </summary>
+    /// <returns>A página com o formulário carregado.</returns>
     public IActionResult OnGet()
     {
         // Cria a lista de opções para a dropdown. 
-        // Vai guardar o "IdLocal" na BD, mas mostrar o "Nome" ao utilizador.
+        // Guarda o "IdLocal" na BD, mas mostra o "Nome" do local ao utilizador.
         ViewData["IdLocal"] = new SelectList(_context.Locais, "IdLocal", "Nome");
         return Page();
     }
 
+    /// <summary>
+    /// Objeto que contém os dados do Evento a ser criado, mapeado a partir do formulário (HTTP POST).
+    /// </summary>
     [BindProperty]
     public Evento Evento { get; set; } = default!;
 
+    /// <summary>
+    /// Processa o pedido HTTP POST para submissão do novo evento.
+    /// Realiza validações de negócio, incluindo datas válidas e prevenção de sobreposição de eventos num mesmo local.
+    /// </summary>
+    /// <returns>
+    /// Redireciona para o índice administrativo em caso de sucesso;
+    /// recarrega a página com mensagens de erro caso existam falhas de validação.
+    /// </returns>
     public async Task<IActionResult> OnPostAsync()
     {
         // Remove as propriedades de navegação da validação, 
@@ -36,26 +64,26 @@ public class CreateModel : PageModel
         ModelState.Remove("Evento.Local");
         ModelState.Remove("Evento.Cartazes");
 
-        // Validação customizada: verificar se o local selecionado existe
+        // Validação de negócio: verificar se o local selecionado existe na base de dados
         var localExists = await _context.Locais.AnyAsync(l => l.IdLocal == Evento.IdLocal);
         if (!localExists)
         {
             ModelState.AddModelError("Evento.IdLocal", "O local selecionado é inválido.");
         }
 
-        // Validação customizada: data de início no futuro
+        // Validação de negócio: a data de início não pode ser no passado
         if (Evento.DataInicio < DateTime.Now)
         {
             ModelState.AddModelError("Evento.DataInicio", "A data de início deve ser no futuro.");
         }
 
-        // Validação customizada: data de fim posterior à data de início
+        // Validação de negócio: a data de fim deve ser posterior à data de início
         if (Evento.DataFim <= Evento.DataInicio)
         {
             ModelState.AddModelError("Evento.DataFim", "A data de fim deve ser posterior à data de início.");
         }
 
-        // Validação customizada: sobreposição de eventos no mesmo local
+        // Validação de negócio: evitar sobreposições de eventos no mesmo local ao mesmo tempo
         if (localExists && Evento.DataFim > Evento.DataInicio)
         {
             bool hasOverlap = await _context.Eventos.AnyAsync(e =>
@@ -69,13 +97,15 @@ public class CreateModel : PageModel
             }
         }
 
+        // Se a validação geral ou as validações de negócio falharem, recarrega o formulário
         if (!ModelState.IsValid)
         {
-            // Se houver algum erro (ex: faltou o nome), precisamos de recarregar a dropdown
+            // É necessário preencher novamente a dropdown para evitar erros na renderização do HTML
             ViewData["IdLocal"] = new SelectList(_context.Locais, "IdLocal", "Nome");
             return Page();
         }
 
+        // Limpa espaços em branco supérfluos introduzidos pelo utilizador
         Evento.Nome = Evento.Nome.Trim();
         if (Evento.Descricao != null)
         {
@@ -86,6 +116,7 @@ public class CreateModel : PageModel
             Evento.Patrocinador = Evento.Patrocinador.Trim();
         }
 
+        // Regista o evento e grava as alterações
         _context.Eventos.Add(Evento);
         await _context.SaveChangesAsync();
 
