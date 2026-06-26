@@ -45,7 +45,7 @@ else
                 @foreach (var artista in Model.Artistas)
                 {
                     var fotoUrl = artista.LinkFotoPerfil;
-                    if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
+                    if (!string.IsNullOrEmpty(fotoUrl) && !fotoUrl.StartsWith("/") && !fotoUrl.StartsWith("http://") && !fotoUrl.StartsWith("https://"))
                         fotoUrl = "https://" + fotoUrl;
 
                     <tr>

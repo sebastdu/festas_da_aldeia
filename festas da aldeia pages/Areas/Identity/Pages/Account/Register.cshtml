@@ -1,0 +1,77 @@
+@page
+@model RegisterModel
+@{
+    ViewData["Title"] = "Registar";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-5 col-md-8">
+        <div class="page-header-container text-center mb-4 border-0">
+            <h1 class="page-title-gradient mb-2">
+                <i class="bi bi-person-plus me-2"></i>Registar
+            </h1>
+            <p class="text-muted mb-0" style="font-size:0.95rem;">Crie uma nova conta de utilizador</p>
+        </div>
+
+        <div class="form-card">
+            <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 d-flex gap-2 align-items-center" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <span></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Input.Email" class="form-label-custom">Email</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                            <i class="bi bi-envelope text-muted"></i>
+                        </span>
+                        <input asp-for="Input.Email" class="form-control form-control-custom" autocomplete="username" aria-required="true" placeholder="exemplo@email.com" style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;" />
+                    </div>
+                    <span asp-validation-for="Input.Email" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Input.Password" class="form-label-custom">Palavra-passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                            <i class="bi bi-lock text-muted"></i>
+                        </span>
+                        <input asp-for="Input.Password" class="form-control form-control-custom" autocomplete="new-password" aria-required="true" placeholder="Mínimo 6 caracteres" style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;" />
+                    </div>
+                    <span asp-validation-for="Input.Password" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="Input.ConfirmPassword" class="form-label-custom">Confirmar Palavra-passe</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                            <i class="bi bi-lock-fill text-muted"></i>
+                        </span>
+                        <input asp-for="Input.ConfirmPassword" class="form-control form-control-custom" autocomplete="new-password" aria-required="true" placeholder="Repita a palavra-passe" style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;" />
+                    </div>
+                    <span asp-validation-for="Input.ConfirmPassword" class="text-danger small mt-1 d-block"></span>
+                </div>
+
+                <div class="mb-4">
+                    <button id="registerSubmit" type="submit" class="w-100 btn btn-primary py-2">
+                        <i class="bi bi-check-circle me-1"></i> Registar Conta
+                    </button>
+                </div>
+
+                <div class="text-center border-top pt-3 mt-4">
+                    <p class="mb-0 text-muted small">
+                        Já tem uma conta? 
+                        <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="text-decoration-none fw-semibold ms-1">
+                            Entrar aqui
+                        </a>
+                    </p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

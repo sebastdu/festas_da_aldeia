@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace festas_da_aldeia.Models
 {
     /// <summary>
-    /// Local onde os eventos podem acontecer
+    /// Representa a entidade Local no sistema RallyFestas.
+    /// Esta classe é encarregue de mapear os recintos e espaços físicos (praças, jardins, auditórios)
+    /// onde decorrem os eventos das festividades, gerindo informação de geolocalização e tipologia do espaço.
     /// </summary>
     public class Local
     {
@@ -39,7 +41,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Coordenadas / Mapa")]
         [StringLength(500, ErrorMessage = "As {0} devem ter um máximo de {1} caracteres.")]
-        [RegularExpression(@"^(-?\d+(\.\d+)?),(-?\d+(\.\d+)?)$|^https?:\/\/.+", 
+        [RegularExpression(@"^(-?\d+(\.\d+)?), (-?\d+(\.\d+)?)$", 
             ErrorMessage = "As coordenadas devem estar no formato latitude,longitude ou ser uma URL válida.")]
         public string? Coordenadas { get; set; } = string.Empty;
 

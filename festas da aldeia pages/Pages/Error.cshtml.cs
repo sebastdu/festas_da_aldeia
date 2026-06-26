@@ -12,8 +12,11 @@ namespace festas_da_aldeia_pages.Pages
 
         public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
 
-        public void OnGet()
+        public int? OriginalStatusCode { get; set; }
+
+        public void OnGet(int? statusCode)
         {
+            OriginalStatusCode = statusCode;
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
         }
     }

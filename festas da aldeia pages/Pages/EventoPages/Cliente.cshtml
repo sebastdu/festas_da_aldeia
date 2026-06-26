@@ -60,6 +60,12 @@
             { <span class="badge-live mb-2 d-inline-flex"><i class="bi bi-circle-fill me-1"></i>Em curso</span> }
             else if (passado)
             { <span class="badge-past mb-2 d-inline-flex"><i class="bi bi-check-circle me-1"></i>Concluído</span> }
+            
+            <span class="d-inline-flex align-items-center gap-1 mb-2 ms-2 px-2 py-0.5 rounded bg-dark bg-opacity-30 text-white border border-white border-opacity-10" style="font-size: 0.72rem; backdrop-filter: blur(6px); vertical-align: middle;">
+                <span class="spinner-grow text-danger" role="status" style="width: 7px; height: 7px; margin-right: 3px;"></span>
+                🔥 <span id="contadorPessoas" class="fw-bold text-warning">1</span> a ver agora
+            </span>
+            
             <h1 class="evento-hero-nome">@Model.Evento.Nome</h1>
             <p class="evento-hero-datas">
                 <i class="bi bi-calendar-range me-2"></i>
@@ -327,6 +333,40 @@
         document.getElementById('selectorDia')?.addEventListener('change', function () {
             document.querySelectorAll('.dia-painel').forEach(p => p.classList.add('d-none'));
             document.getElementById(this.value)?.classList.remove('d-none');
+        });
+    </script>
+
+    <script>
+        // ID do evento para SignalR
+        const eventoId = "@Model.Evento.IdEvento.ToString()"; 
+
+        // Conexão ao Hub do SignalR
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/visualizacoesHub")
+            .build();
+
+        // Escuta atualizações do servidor
+        connection.on("AtualizarContador", function (contador) {
+            const el = document.getElementById("contadorPessoas");
+            if (el) {
+                el.innerText = contador;
+            }
+        });
+
+        // Conecta e regista a visualização da página
+        connection.start().then(function () {
+            connection.invoke("EntrarNaPagina", eventoId).catch(function (err) {
+                console.error("Erro ao entrar na página:", err.toString());
+            });
+        }).catch(function (err) {
+            console.error("Erro ao conectar ao SignalR:", err.toString());
+        });
+
+        // Notifica o servidor ao sair da página
+        window.addEventListener("beforeunload", function () {
+            connection.invoke("SairDaPagina", eventoId).catch(function (err) {
+                console.error("Erro ao sair da página:", err.toString());
+            });
         });
     </script>
 

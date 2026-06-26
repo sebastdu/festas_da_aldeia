@@ -16,7 +16,7 @@
 <div class="row">
     <div class="col-lg-7 col-md-9">
         <div class="form-card">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                 <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 d-flex gap-2 align-items-center" role="alert">
                     <i class="bi bi-exclamation-triangle-fill"></i>
                     <span></span>
@@ -54,18 +54,38 @@
                     <span asp-validation-for="Artista.Contacto" class="text-danger small mt-1 d-block"></span>
                 </div>
 
+                @if (!string.IsNullOrEmpty(Model.Artista.LinkFotoPerfil))
+                {
+                    <div class="mb-4">
+                        <label class="form-label-custom d-block">Foto de Perfil Atual</label>
+                        <div class="d-flex align-items-center gap-3">
+                            <img src="@Model.Artista.LinkFotoPerfil" alt="Foto de @Model.Artista.Nome" 
+                                 class="img-thumbnail rounded" style="width: 100px; height: 100px; object-fit: cover;" />
+                            <small class="text-muted">@Model.Artista.LinkFotoPerfil</small>
+                        </div>
+                    </div>
+                }
+
+                <div class="mb-4">
+                    <label for="FotoUpload" class="form-label-custom">Substituir por nova Imagem (Upload)</label>
+                    <input type="file" id="FotoUpload" name="FotoUpload" class="form-control form-control-custom" accept="image/*" />
+                    <span asp-validation-for="FotoUpload" class="text-danger small mt-1 d-block"></span>
+                    <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>Selecione um ficheiro de imagem local (.jpg, .png, etc.) - Prioritário sobre o link</small>
+                </div>
+
                 <div class="mb-5">
                     <label asp-for="Artista.LinkFotoPerfil" class="form-label-custom">
-                        @Html.DisplayNameFor(m => m.Artista.LinkFotoPerfil)
+                        Ou altere o Link de Imagem (URL)
                     </label>
                     <div class="input-group">
                         <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
-                            <i class="bi bi-image text-muted"></i>
+                            <i class="bi bi-link-45deg text-muted"></i>
                         </span>
                         <input asp-for="Artista.LinkFotoPerfil" class="form-control form-control-custom"
                                style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;" />
                     </div>
                     <span asp-validation-for="Artista.LinkFotoPerfil" class="text-danger small mt-1 d-block"></span>
+                    <small class="text-muted mt-1 d-block"><i class="bi bi-info-circle me-1"></i>Se não fizer upload de um ficheiro, pode alterar o link direto para a imagem</small>
                 </div>
 
                 <div class="d-flex gap-2">
