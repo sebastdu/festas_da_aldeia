@@ -5,21 +5,21 @@ namespace festas_da_aldeia_pages.Hubs
 {
     public class VisualizacoesHub : Hub
     {
-        // Thread-safe dictionary to maintain count of spectators per event
+        // Dicionário thread-safe para manter a contagem de espectadores por evento
         private static readonly ConcurrentDictionary<string, int> _espectadores = new ConcurrentDictionary<string, int>();
 
-        // Tracks event pages visited by connection ID to auto-decrement on abrupt disconnects
+        // Regista os eventos visitados por ID de ligação para decrementar automaticamente em desligamentos abruptos
         private static readonly ConcurrentDictionary<string, ConcurrentBag<string>> _conexoesEventos = new ConcurrentDictionary<string, ConcurrentBag<string>>();
 
         public async Task EntrarNaPagina(string eventoId)
         {
-            // Add user to the exclusive event group
+            // Adiciona o utilizador ao grupo exclusivo do evento
             await Groups.AddToGroupAsync(Context.ConnectionId, eventoId);
 
-            // Increment spectator count thread-safely
+            // Incrementa a contagem de espectadores de forma thread-safe
             _espectadores.AddOrUpdate(eventoId, 1, (key, value) => value + 1);
 
-            // Associate the current connection to this event
+            // Associa a ligação atual a este evento
             _conexoesEventos.AddOrUpdate(
                 Context.ConnectionId,
                 new ConcurrentBag<string> { eventoId },
@@ -33,7 +33,7 @@ namespace festas_da_aldeia_pages.Hubs
                 }
             );
 
-            // Notify all clients in the group of the updated count
+            // Notifica todos os clientes no grupo sobre a contagem atualizada
             await Clients.Group(eventoId).SendAsync("AtualizarContador", _espectadores.GetValueOrDefault(eventoId, 0));
         }
 
@@ -41,15 +41,15 @@ namespace festas_da_aldeia_pages.Hubs
         {
             await Groups.RemoveFromGroupAsync(Context.ConnectionId, eventoId);
 
-            // Decrement spectator count thread-safely
+            // Decrementa a contagem de espectadores de forma thread-safe
             _espectadores.AddOrUpdate(eventoId, 0, (key, value) => Math.Max(0, value - 1));
 
-            // Remove association from connection tracking
+            // Remove a associação do registo de ligações
             if (_conexoesEventos.TryGetValue(Context.ConnectionId, out var bag))
             {
-                // Note: ConcurrentBag doesn't easily support removal of arbitrary items.
-                // However, since connection will disconnect eventually, clean-up happens in OnDisconnectedAsync.
-                // To keep it simple, we can filter/recreate if we want, but since they called SairDaPagina, we don't strictly need to do more here.
+                // Nota: ConcurrentBag não suporta facilmente a remoção de itens específicos.
+                // No entanto, como a ligação acabará por ser desligada, a limpeza ocorre no OnDisconnectedAsync.
+                // Para manter simples, uma vez que chamaram SairDaPagina, não precisamos de fazer mais nada aqui.
             }
 
             await Clients.Group(eventoId).SendAsync("AtualizarContador", _espectadores.GetValueOrDefault(eventoId, 0));
@@ -57,7 +57,7 @@ namespace festas_da_aldeia_pages.Hubs
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            // Auto clean-up if client disconnects abruptly
+            // Limpeza automática caso o cliente se desligue abruptamente
             if (_conexoesEventos.TryRemove(Context.ConnectionId, out var eventos))
             {
                 foreach (var eventoId in eventos)

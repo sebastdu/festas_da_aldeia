@@ -39,7 +39,7 @@ namespace festas_da_aldeia.Models
         /// </summary>
         [Display(Name = "Coordenadas / Mapa")]
         [StringLength(500, ErrorMessage = "As {0} devem ter um máximo de {1} caracteres.")]
-        [RegularExpression(@"^(-?\d+(\.\d+)?),(-?\d+(\.\d+)?)$|^https?:\/\/.+", 
+        [RegularExpression(@"^(-?\d+(\.\d+)?), (-?\d+(\.\d+)?)$", 
             ErrorMessage = "As coordenadas devem estar no formato latitude,longitude ou ser uma URL válida.")]
         public string? Coordenadas { get; set; } = string.Empty;
 

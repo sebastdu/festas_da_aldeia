@@ -12,7 +12,7 @@
         <div class="row align-items-center">
             <div class="col-lg-8 text-center text-lg-start">
                 <h1 class="display-3 fw-extrabold mb-3 tracking-tight text-white leading-none">
-                    Bem-vindo ao <span class="text-primary-gradient" style="background: linear-gradient(90deg, #818cf8, #38bdf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">RallyFestas</span>
+                    Bem-vindo ao <span class="text-primary-gradient">RallyFestas</span>
                 </h1>
                 <p class="lead text-white-50 fs-5 mb-4 max-w-xl mx-auto mx-lg-0">
                     Arranca para a tradição! Faz o teu rally por recintos, palcos e tasquinhas. Atesta o convívio com música ao vivo e gastronomia local, e planeia já a tua próxima etapa.
@@ -132,7 +132,7 @@
         
         <!-- Map Container -->
         <div class="position-relative rounded-3 overflow-hidden border" style="height: 450px; background-color: #e2e8f0; z-index: 1;">
-            <div id="map" style="height: 100%; width: 100%;"></div>
+            <div id="map" style="height: 100%; width: 100%;" data-events="@JsonSerializer.Serialize(Model.EventosMapa)"></div>
             
             <!-- Notice overlay if geolocation status changes -->
             <div id="map-notice" class="position-absolute bottom-0 start-0 m-3 p-2 bg-white rounded shadow-sm d-none" style="z-index: 1000; max-width: 280px; font-size: 0.85rem; border: 1px solid var(--border-light);">
@@ -297,137 +297,8 @@
                 }
             </div>
         }
-    <style>
-/* Micro-animation for floating logo in hero banner */
-.floating-logo {
-    animation: float 4s ease-in-out infinite;
-}
-
-@@keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-    100% { transform: translateY(0px); }
-}
-
-.border-dashed {
-    border: 2px dashed var(--border-light) !important;
-    background: transparent !important;
-}
-
-.transition-all {
-    transition: all var(--transition-normal);
-}
-
-.hover-translate-y:hover {
-    transform: translateY(-2px);
-}
-
-/* Leaflet map improvements to match page style */
-#map {
-    z-index: 10;
-}
-.leaflet-popup-content-wrapper {
-    border-radius: var(--radius-md) !important;
-    box-shadow: var(--shadow-lg) !important;
-    border: 1px solid var(--border-light) !important;
-}
-.leaflet-popup-tip {
-    box-shadow: var(--shadow-sm) !important;
-}
-.leaflet-popup-content {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif !important;
-    color: var(--text-main) !important;
-    margin: 12px 16px !important;
-}
-.leaflet-popup-content h6 {
-    font-size: 0.95rem;
-}
-.spinner-border-sm {
-    width: 1rem;
-    height: 1rem;
-    border-width: 0.15em;
-}
-
-/* Premium styling for filters */
-.map-controls-panel {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid var(--border-light);
-    box-shadow: var(--shadow-sm);
-    transition: var(--transition-normal);
-}
-
-.custom-slider {
-    height: 6px;
-    background-color: var(--border-light);
-    border-radius: var(--radius-full);
-    outline: none;
-}
-
-.custom-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: var(--primary-color);
-    cursor: pointer;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-    transition: transform var(--transition-fast), background-color var(--transition-fast);
-}
-
-.custom-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    background: #4f46e5;
-}
-
-.custom-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border: none;
-    border-radius: 50%;
-    background: var(--primary-color);
-    cursor: pointer;
-    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
-    transition: transform var(--transition-fast), background-color var(--transition-fast);
-}
-
-.custom-slider::-moz-range-thumb:hover {
-    transform: scale(1.2);
-    background: #4f46e5;
-}
-
-.animate-pulse {
-    animation: pulse 1.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-@@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-        transform: scale(1);
-    }
-    50% {
-        opacity: .4;
-        transform: scale(1.1);
-    }
-}
-
-.animate-fade-in {
-    animation: fadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(8px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-</style>
+    </div>
+</div>
 
 @section Scripts {
     <!-- Leaflet JS -->
@@ -435,7 +306,8 @@
     
     <script>
         // Dados dos eventos vindos do servidor
-        const mapEvents = @Html.Raw(JsonSerializer.Serialize(Model.EventosMapa));
+        const mapElement = document.getElementById('map');
+        const mapEvents = JSON.parse(mapElement?.getAttribute('data-events') || '[]');
         
         document.addEventListener("DOMContentLoaded", function () {
             let defaultLat = 39.6030;
