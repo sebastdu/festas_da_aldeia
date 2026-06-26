@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace festas_da_aldeia_pages.Pages.EventoPages;
 /// Modelo da página de listagem administrativa de Eventos.
 /// Carrega e apresenta a lista de eventos com suporte para paginação.
 /// </summary>
+[Authorize]
 public class IndexModel : PageModel
 {
     /// <summary>

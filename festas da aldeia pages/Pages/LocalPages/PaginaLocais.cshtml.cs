@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace festas_da_aldeia_pages.Pages.LocalPages;
 /// Modelo da página pública individual de um Local (ex: detalhes com mapa e eventos próprios).
 /// Carrega as informações detalhadas de um local e a lista completa de eventos agendados para o mesmo.
 /// </summary>
+[Authorize]
 public class PaginaLocaisModel : PageModel
 {
     /// <summary>

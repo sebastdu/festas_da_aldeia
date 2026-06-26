@@ -10,6 +10,8 @@ namespace festas_da_aldeia.Data
         {
             // 1. Seed Roles
             string adminRole = "Admin";
+            string clienteRole = "Cliente";
+
             if (!await roleManager.RoleExistsAsync(adminRole))
             {
                 var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
@@ -20,12 +22,21 @@ namespace festas_da_aldeia.Data
                 }
             }
 
+            if (!await roleManager.RoleExistsAsync(clienteRole))
+            {
+                var roleResult = await roleManager.CreateAsync(new IdentityRole(clienteRole));
+                if (!roleResult.Succeeded)
+                {
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Falha ao criar a Role Cliente: {errors}");
+                }
+            }
+
             // 2. Seed Admin User
             string adminEmail = "admin@festas.com";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
             if (adminUser != null)
             {
-                // Garantir que a password atualizada (com maiúscula) é aplicada recriando o utilizador
                 await userManager.DeleteAsync(adminUser);
                 adminUser = null;
             }
@@ -37,7 +48,7 @@ namespace festas_da_aldeia.Data
                     Email = adminEmail,
                     EmailConfirmed = true
                 };
-                var createResult = await userManager.CreateAsync(adminUser, "123Qwe##");
+                var createResult = await userManager.CreateAsync(adminUser, "Password123!");
                 if (createResult.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, adminRole);
@@ -49,8 +60,35 @@ namespace festas_da_aldeia.Data
                 }
             }
 
+            // Seed Cliente User
+            string clienteEmail = "cliente@festas.com";
+            var clienteUser = await userManager.FindByEmailAsync(clienteEmail);
+            if (clienteUser != null)
+            {
+                await userManager.DeleteAsync(clienteUser);
+                clienteUser = null;
+            }
+            if (clienteUser == null)
+            {
+                clienteUser = new IdentityUser
+                {
+                    UserName = clienteEmail,
+                    Email = clienteEmail,
+                    EmailConfirmed = true
+                };
+                var createResult = await userManager.CreateAsync(clienteUser, "Password123!");
+                if (createResult.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(clienteUser, clienteRole);
+                }
+                else
+                {
+                    var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
+                    throw new Exception($"Falha ao criar o utilizador cliente: {errors}");
+                }
+            }
+
             // 3. Seed Locais (Locations)
-            // Definimos a lista completa de locais (originais e novos)
             var todosLocais = new List<Local>
             {
                 new Local

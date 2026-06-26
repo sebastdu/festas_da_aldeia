@@ -18,27 +18,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdmin", policy => policy.RequireRole("Admin"));
 });
 
-builder.Services.AddRazorPages(options =>
-{
-    options.Conventions.AuthorizeFolder("/CartazPages", "RequireAdmin");
-    
-    options.Conventions.AuthorizePage("/ArtistaPages/Admin", "RequireAdmin");
-    options.Conventions.AuthorizePage("/ArtistaPages/Create", "RequireAdmin");
-    options.Conventions.AuthorizePage("/ArtistaPages/Edit", "RequireAdmin");
-    options.Conventions.AuthorizePage("/ArtistaPages/Delete", "RequireAdmin");
-    
-    options.Conventions.AuthorizePage("/EventoPages/Index", "RequireAdmin");
-    options.Conventions.AuthorizePage("/EventoPages/Create", "RequireAdmin");
-    options.Conventions.AuthorizePage("/EventoPages/Edit", "RequireAdmin");
-    options.Conventions.AuthorizePage("/EventoPages/Delete", "RequireAdmin");
-    options.Conventions.AuthorizePage("/EventoPages/Details", "RequireAdmin");
-    
-    options.Conventions.AuthorizePage("/LocalPages/Index", "RequireAdmin");
-    options.Conventions.AuthorizePage("/LocalPages/Create", "RequireAdmin");
-    options.Conventions.AuthorizePage("/LocalPages/Edit", "RequireAdmin");
-    options.Conventions.AuthorizePage("/LocalPages/Delete", "RequireAdmin");
-    options.Conventions.AuthorizePage("/LocalPages/Details", "RequireAdmin");
-});
+builder.Services.AddRazorPages();
 
 builder.Services.AddSignalR();
 

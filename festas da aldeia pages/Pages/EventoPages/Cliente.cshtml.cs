@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +11,7 @@ namespace festas_da_aldeia_pages.Pages.EventoPages;
 /// Modelo da página de visualização de Eventos destinada aos utilizadores finais (público em geral).
 /// Carrega o evento e gera dinamicamente uma listagem dos dias de duração do mesmo para filtragem na view.
 /// </summary>
+[Authorize]
 public class ClienteModel : PageModel
 {
     /// <summary>

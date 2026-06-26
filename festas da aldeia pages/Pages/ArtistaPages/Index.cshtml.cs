@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace festas_da_aldeia_pages.Pages.ArtistaPages;
 /// Suporta filtros de pesquisa por texto livre, ordenação parametrizável (alfabética ou por número de atuações)
 /// e paginação dos resultados obtidos.
 /// </summary>
+[Authorize]
 public class IndexModel : PageModel
 {
     /// <summary>
