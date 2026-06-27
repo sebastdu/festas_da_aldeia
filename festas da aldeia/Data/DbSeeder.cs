@@ -61,7 +61,7 @@ namespace festas_da_aldeia.Data
                     Email = adminEmail,
                     EmailConfirmed = true
                 };
-                var createResult = await userManager.CreateAsync(adminUser, "Password123!");
+                var createResult = await userManager.CreateAsync(adminUser, "123Qwe##");
                 if (createResult.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, adminRole);
@@ -89,7 +89,7 @@ namespace festas_da_aldeia.Data
                     Email = clienteEmail,
                     EmailConfirmed = true
                 };
-                var createResult = await userManager.CreateAsync(clienteUser, "Password123!");
+                var createResult = await userManager.CreateAsync(clienteUser, "123Qwe##");
                 if (createResult.Succeeded)
                 {
                     await userManager.AddToRoleAsync(clienteUser, clienteRole);
