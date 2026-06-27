@@ -1,40 +1,67 @@
 @page
 @model EmailModel
 @{
-    ViewData["Title"] = "Manage Email";
+    ViewData["Title"] = "Gerir E-mail";
     ViewData["ActivePage"] = ManageNavPages.Email;
 }
 
-<h3>@ViewData["Title"]</h3>
+<h3 class="mb-4">@ViewData["Title"]</h3>
 <partial name="_StatusMessage" for="StatusMessage" />
+
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-md-12">
         <form id="email-form" method="post">
-            <div asp-validation-summary="All" class="text-danger" role="alert"></div>
+            <div asp-validation-summary="All" class="alert alert-danger mb-4 d-flex gap-2 align-items-center" role="alert">
+                <i class="bi bi-exclamation-triangle-fill"></i>
+                <span></span>
+            </div>
+            
             @if (Model.IsEmailConfirmed)
             {
-                <div class="form-floating mb-3 input-group">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                        <div class="input-group-append">
-                            <span class="h-100 input-group-text text-success font-weight-bold">?</span>
-                        </div>
-                    <label asp-for="Email" class="form-label"></label>
+                <div class="mb-4">
+                    <label asp-for="Email" class="form-label-custom">E-mail atual</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                            <i class="bi bi-envelope text-muted"></i>
+                        </span>
+                        <input asp-for="Email" class="form-control form-control-custom" placeholder="E-mail" disabled style="border-left:none;border-radius:0; background-color: #f1f5f9;" />
+                        <span class="input-group-text bg-light border-start-0 text-success d-flex align-items-center justify-content-center" style="border:1.5px solid var(--border-light);border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0; min-width: 46px;">
+                            <i class="bi bi-check-circle-fill text-success" title="E-mail Confirmado"></i>
+                        </span>
+                    </div>
                 </div>
             }
             else
             {
-                <div class="form-floating mb-3">
-                    <input asp-for="Email" class="form-control" placeholder="Please enter your email." disabled />
-                    <label asp-for="Email" class="form-label"></label>
-                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
+                <div class="mb-4">
+                    <label asp-for="Email" class="form-label-custom">E-mail atual</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                            <i class="bi bi-envelope text-muted"></i>
+                            <span class="sr-only">Email não verificado !!</span>
+                        </span>
+                        <input asp-for="Email" class="form-control form-control-custom" placeholder="E-mail" disabled style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0; background-color: #f1f5f9;" />
+                    </div>
+                    <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link p-0 mt-2 text-decoration-none small fw-semibold">
+                        <i class="bi bi-envelope-check me-1"></i> Enviar e-mail de verificação
+                    </button>
                 </div>
             }
-            <div class="form-floating mb-3">
-                <input asp-for="Input.NewEmail" class="form-control" autocomplete="email" aria-required="true" placeholder="Please enter new email." />
-                <label asp-for="Input.NewEmail" class="form-label"></label>
-                <span asp-validation-for="Input.NewEmail" class="text-danger"></span>
+            
+            <div class="mb-4">
+                <label asp-for="Input.NewEmail" class="form-label-custom">Novo e-mail</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0" style="border:1.5px solid var(--border-light);border-right:none;border-radius:var(--radius-sm) 0 0 var(--radius-sm);">
+                        <i class="bi bi-envelope-plus text-muted"></i>
+                    </span>
+                    <input asp-for="Input.NewEmail" class="form-control form-control-custom" autocomplete="email" aria-required="true" placeholder="exemplo@novoemail.com" style="border-left:none;border-radius:0 var(--radius-sm) var(--radius-sm) 0;" />
+                </div>
+                <span asp-validation-for="Input.NewEmail" class="text-danger small mt-1 d-block"></span>
             </div>
-            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-lg btn-primary">Change email</button>
+            
+            <button id="change-email-button" type="submit" asp-page-handler="ChangeEmail" class="w-100 btn btn-primary py-2 mt-2">
+                <i class="bi bi-pencil-square me-1"></i> Alterar e-mail
+            </button>
         </form>
     </div>
 </div>
@@ -42,3 +69,4 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
+

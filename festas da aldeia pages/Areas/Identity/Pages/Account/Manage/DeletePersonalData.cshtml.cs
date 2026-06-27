@@ -47,6 +47,7 @@ public class DeletePersonalDataModel : PageModel
         /// </summary>
         [Required]
         [DataType(DataType.Password)]
+        [Display(Name = "Palavra-passe")]
         public string Password { get; set; } = default!;
     }
 
@@ -61,7 +62,7 @@ public class DeletePersonalDataModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound($"Não foi possível carregar o utilizador com o ID '{_userManager.GetUserId(User)}'.");
         }
 
         RequirePassword = await _userManager.HasPasswordAsync(user);
@@ -73,7 +74,7 @@ public class DeletePersonalDataModel : PageModel
         var user = await _userManager.GetUserAsync(User);
         if (user == null)
         {
-            return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            return NotFound($"Não foi possível carregar o utilizador com o ID '{_userManager.GetUserId(User)}'.");
         }
 
         RequirePassword = await _userManager.HasPasswordAsync(user);
@@ -81,7 +82,7 @@ public class DeletePersonalDataModel : PageModel
         {
             if (!await _userManager.CheckPasswordAsync(user, Input.Password))
             {
-                ModelState.AddModelError(string.Empty, "Incorrect password.");
+                ModelState.AddModelError(string.Empty, "Palavra-passe incorreta.");
                 return Page();
             }
         }
@@ -90,7 +91,7 @@ public class DeletePersonalDataModel : PageModel
         var userId = await _userManager.GetUserIdAsync(user);
         if (!result.Succeeded)
         {
-            throw new InvalidOperationException($"Unexpected error occurred deleting user.");
+            throw new InvalidOperationException($"Ocorreu um erro inesperado ao eliminar o utilizador.");
         }
 
         await _signInManager.SignOutAsync();
