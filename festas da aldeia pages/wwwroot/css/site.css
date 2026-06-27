@@ -1991,3 +1991,9 @@ h1, h2, h3, h4, h5, h6 {
         transform: translateY(0);
     }
 }
+
+/* Hide empty validation summaries (which otherwise show due to Bootstrap's d-flex overriding default display) */
+.validation-summary-valid {
+    display: none !important;
+}
+
